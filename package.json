@@ -1,0 +1,12 @@
+{
+  "name": "api-multitenant-hseq",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.26.1",
+    "express": "^4.17.3",
+    "redis": "^4.0.4",
+    "response-time": "^2.3.2"
+  }
+}
