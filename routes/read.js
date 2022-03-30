@@ -73,7 +73,10 @@ router.post('/', async(req, res, next) => {
             values: _data.value
           });
         }else{
-          return res.send(_data.value);
+          return res.send({
+            count: null,
+            values: _data.value
+          });
         }
       }]
     };
