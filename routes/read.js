@@ -21,10 +21,15 @@ router.post('/', async(req, res, next) => {
     const userEmail = (req.query.userEmail || (req.body && req.body.userEmail));
     const isPerzonalized = (req.query.isPerzonalized || (req.body && req.body.isPerzonalized));
     
-
     if(!refresh){
       const reply = await client.get(isPerzonalized ? entity + userEmail : entity);
-      if (reply) return res.send(JSON.parse(reply));
+      if (reply){ 
+        const response = JSON.parse(reply);
+        return res.send({
+          count: withCount ? response.count : null,
+          value: response.values
+        });
+      }
     }
 
     var token;
@@ -59,25 +64,19 @@ router.post('/', async(req, res, next) => {
       data: {},
       transformResponse: [async (data) => {
         const _data = JSON.parse(data);
-
+        var response = {
+          count: withCount ? _data["@odata.count"] : null,
+          values: _data.value
+        };
+        
         await client.set(
           isPerzonalized ? entity + userEmail : entity,
-          JSON.stringify(_data.value),
+          JSON.stringify(response),
           {
             EX: 3599,
           }
         );
-        if(withCount){
-          return res.send({
-            count: _data["@odata.count"],
-            values: _data.value
-          });
-        }else{
-          return res.send({
-            count: null,
-            values: _data.value
-          });
-        }
+        return res.send(response);
       }]
     };
     await axios(optionsEntity);  
