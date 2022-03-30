@@ -20,6 +20,7 @@ router.post('/', async(req, res, next) => {
     const refresh = (req.query.refresh || (req.body && req.body.refresh));
     const userEmail = (req.query.userEmail || (req.body && req.body.userEmail));
     const isPerzonalized = (req.query.isPerzonalized || (req.body && req.body.isPerzonalized));
+    const expirationTime = (req.query.expirationTime || (req.body && req.body.expirationTime));
     
     if(!refresh){
       const reply = await client.get(isPerzonalized ? entity + userEmail : entity);
@@ -73,7 +74,7 @@ router.post('/', async(req, res, next) => {
           isPerzonalized ? entity + userEmail : entity,
           JSON.stringify(response),
           {
-            EX: 3599,
+            EX: expirationTime ? expirationTime : 9999999,
           }
         );
         return res.send(response);
