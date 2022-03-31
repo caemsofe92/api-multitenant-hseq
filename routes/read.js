@@ -1,10 +1,9 @@
-var express = require('express');
-var router = express.Router();
+let express = require('express');
+let router = express.Router();
 const client = require('../bin/redis-client');
 const axios = require("axios");
 
-router.post('/', async(req, res, next) => {
-
+router.post('/', async(req, res) => {
     const tenantUrl = (req.query.tenantUrl || (req.body && req.body.tenantUrl));
     const clientId = (req.query.clientId || (req.body && req.body.clientId));
     const clientSecret = (req.query.clientSecret || (req.body && req.body.clientSecret));
@@ -24,17 +23,10 @@ router.post('/', async(req, res, next) => {
     
     if(!refresh){
       const reply = await client.get(isPerzonalized ? entity + userEmail : entity);
-      if (reply){ 
-        const response = JSON.parse(reply);
-        return res.send({
-          count: withCount ? response.count : null,
-          values: response.values
-        });
-      }
+      if (reply) return res.send(reply);
     }
 
-    var token;
-    token = await client.get(tenant);
+    let token = await client.get(tenant);
 
     if (!token){
       const optionsToken = {
@@ -64,20 +56,18 @@ router.post('/', async(req, res, next) => {
       headers: {'Authorization': "Bearer " + token},
       data: {},
       transformResponse: [async (data) => {
-        const _data = JSON.parse(data);
-        var response = {
-          count: withCount ? _data["@odata.count"] : null,
-          values: _data.value
-        };
-        
+        const response = JSON.parse(data);
+        const _data = JSON.stringify({c:response["@odata.count"],v:response.value});
+   
         await client.set(
           isPerzonalized ? entity + userEmail : entity,
-          JSON.stringify(response),
+          _data,
           {
             EX: expirationTime ? expirationTime : 9999999,
           }
         );
-        return res.send(response);
+        return res.send(_data);
+       
       }]
     };
     await axios(optionsEntity);  

@@ -1,6 +1,7 @@
 var createError = require('http-errors');
 var express = require('express');
 var cookieParser = require('cookie-parser');
+const compression = require('compression')
 
 var indexRouter = require('./routes/index');
 var entitiesRouter = require('./routes/entities');
@@ -11,6 +12,7 @@ var deleteRouter = require('./routes/delete');
 var specialRouter = require('./routes/special');
 
 var app = express();
+app.use(compression());
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: false }));
