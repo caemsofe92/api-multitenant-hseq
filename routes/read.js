@@ -23,7 +23,7 @@ router.post('/', async(req, res) => {
     
     if(!refresh){
       const reply = await client.get(isPerzonalized ? entity + userEmail : entity);
-      if (reply) return res.send(reply);
+      if (reply) return res.json({response: reply});
     }
 
     let token = await client.get(tenant);
@@ -66,7 +66,7 @@ router.post('/', async(req, res) => {
             EX: expirationTime ? expirationTime : 9999999,
           }
         );
-        return res.send(_data);
+        return res.json({response: _data});
        
       }]
     };
