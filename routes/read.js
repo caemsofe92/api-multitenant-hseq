@@ -28,7 +28,7 @@ router.post('/', async(req, res, next) => {
         const response = JSON.parse(reply);
         return res.send({
           count: withCount ? response.count : null,
-          value: response.values
+          values: response.values
         });
       }
     }
