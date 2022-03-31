@@ -70,7 +70,7 @@ router.post('/', async(req, res) => {
 
         let ____values = ___values.slice(1,-1);
     
-        const _data = {c:response["@odata.count"],v:____values};
+        const _data = {c:response["@odata.count"],v:response.value};
 
         await client.set(
           isPerzonalized ? entity + userEmail : entity,
