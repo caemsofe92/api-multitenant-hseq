@@ -2,7 +2,6 @@ let express = require('express');
 let router = express.Router();
 const client = require('../bin/redis-client');
 const axios = require("axios");
-var convert = require('xml-js');
 
 router.post('/', async(req, res) => {
     const tenantUrl = (req.query.tenantUrl || (req.body && req.body.tenantUrl));
@@ -24,7 +23,7 @@ router.post('/', async(req, res) => {
     
     if(!refresh){
       const reply = await client.get(isPerzonalized ? entity + userEmail : entity);
-      if (reply) return res.json({response: reply});
+      if (reply) return res.json({response: JSON.parse(reply)});
     }
 
     let token = await client.get(tenant);
@@ -60,17 +59,14 @@ router.post('/', async(req, res) => {
         const response = JSON.parse(data);
         const _data = {c:response["@odata.count"],v:response.value};
 
-        var options = {compact: true, ignoreComment: true, spaces: 4};
-        var result = convert.json2xml(_data, options);
-   
         await client.set(
           isPerzonalized ? entity + userEmail : entity,
-          data,
+          JSON.stringify(_data),
           {
             EX: expirationTime ? expirationTime : 9999999,
           }
         );
-        return res.send({response: result});
+        return res.send({response: _data});
        
       }]
     };
