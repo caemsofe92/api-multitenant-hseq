@@ -57,7 +57,18 @@ router.post('/', async(req, res) => {
       data: {},
       transformResponse: [async (data) => {
         const response = JSON.parse(data);
-        const _data = {c:response["@odata.count"],v:JSON.stringify(response.value)};
+
+        let values = JSON.stringify(response.value);
+       
+        const regex = /,/g;
+        const regex2 = /{\"/g;
+        const regex3 = /":/g;
+
+        let _values = values.replace(regex, ';');
+        let __values = _values.replace(regex2, `{`);
+        let ___values = __values.replace(regex3, `:`);
+        
+        const _data = {c:response["@odata.count"],v:___values};
 
         await client.set(
           isPerzonalized ? entity + userEmail : entity,
