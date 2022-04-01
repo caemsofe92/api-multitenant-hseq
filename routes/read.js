@@ -82,8 +82,6 @@ router.post('/', async(req, res) => {
           }
         });
 
-   
-
         const _data = {
           Companies: responses[0].data,
           SRFSecurityRoles: responses[1].data,
@@ -102,9 +100,10 @@ router.post('/', async(req, res) => {
           SRF_HSEApprovalLineEntity: responses[14].data,
           SRF_HSEItemsEvaluateEntity: responses[15].data,
           SRF_HSEDiagnosticEntity: responses[16].data,
-          SRF_HSEDiagnosticLine: SRF_HSEDiagnosticLine2,
+          SRF_HSEDiagnosticLine: responses[17].data,
           SRF_HSEComplianceEvidencesEntity: responses[18].data,
           SRF_HSEImprovementOpportunities: responses[19].data,
+          SRF_HSEDiagnosticLine2: SRF_HSEDiagnosticLine2
         };
 
         await client.set(
