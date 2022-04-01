@@ -73,6 +73,17 @@ router.post('/', async(req, res) => {
 
       await axios.all([Entity1, Entity2, Entity3, Entity4,Entity5, Entity6, Entity7, Entity8, Entity9, Entity10, Entity11, Entity12, Entity13, Entity14, Entity15, Entity16, Entity17, Entity18, Entity19, Entity20]).then(axios.spread(async (...responses) => {
         
+        const SRF_HSEDiagnosticLine2 = responses[17].data.value.map(item => {
+          const approvalList = (responses[14].data.value.filter(approvalElement => approvalElement.IdApproval === item.IdApproval && approvalElement.dataAreaId === item.dataAreaId)).map(approvalElement => approvalElement.Score);
+          return {
+            ...item, 
+            MaxScore: Math.max(...approvalList),
+            MinScore: Math.min(...approvalList)
+          }
+        });
+
+   
+
         const _data = {
           Companies: responses[0].data,
           SRFSecurityRoles: responses[1].data,
@@ -91,9 +102,9 @@ router.post('/', async(req, res) => {
           SRF_HSEApprovalLineEntity: responses[14].data,
           SRF_HSEItemsEvaluateEntity: responses[15].data,
           SRF_HSEDiagnosticEntity: responses[16].data,
-          SRF_HSEDiagnosticLine: responses[17].data,
+          SRF_HSEDiagnosticLine: SRF_HSEDiagnosticLine2,
           SRF_HSEComplianceEvidencesEntity: responses[18].data,
-          SRF_HSEImprovementOpportunities: responses[19].data
+          SRF_HSEImprovementOpportunities: responses[19].data,
         };
 
         await client.set(
