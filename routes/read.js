@@ -72,14 +72,14 @@ router.post('/', async(req, res) => {
     const Entity20 = axios.get(`${tenant}/data/SRF_HSEImprovementOpportunities?$format=application/json;odata.metadata=none${ numberOfElements ? "&$top=" + numberOfElements : ""}&cross-company=true`, { headers: {'Authorization': "Bearer " + token}});
     const Entity21 = axios.get(`${tenant}/data/SRF_HcmWorkerEntity?$format=application/json;odata.metadata=none${ numberOfElements ? "&$top=" + numberOfElements : ""}&cross-company=true&$select=Name,PersonnelNumber,Locator,DataArea`, { headers: {'Authorization': "Bearer " + token}});
     const Entity22 = axios.get(`${tenant}/data/PersonUsers?$format=application/json;odata.metadata=none${ numberOfElements ? "&$top=" + numberOfElements : ""}&cross-company=true&$filter=UserEmail eq '${userEmail}'`, { headers: {'Authorization': "Bearer " + token}});
-    const Entity23 = axios.get(`${tenant}/data/HcmWorkers?$format=application/json;odata.metadata=none${ numberOfElements ? "&$top=" + numberOfElements : ""}&cross-company=true`, { headers: {'Authorization': "Bearer " + token}});
+    const Entity23 = axios.get(`${tenant}/data/HcmWorkers?$format=application/json;odata.metadata=none&cross-company=true`, { headers: {'Authorization': "Bearer " + token}});
     
       await axios.all([Entity1, Entity2, Entity3, Entity4,Entity5, Entity6, Entity7, Entity8, Entity9, Entity10, Entity11, Entity12, Entity13, Entity14, Entity15, Entity16, Entity17, Entity18, Entity19, Entity20, Entity21, Entity22, Entity23]).then(axios.spread(async (...responses) => {
         
-        const SRF_HSEDiagnosticLine = responses[17].data.value;
-        const SRF_HSEApprovalLineEntity = responses[14].data.value;
-        const SRF_HSEDiagnosticLine2 = SRF_HSEDiagnosticLine.map(item => {
-          const approvalList = (SRF_HSEApprovalLineEntity.filter(approvalElement => approvalElement.IdApproval === item.IdApproval && approvalElement.dataAreaId === item.dataAreaId)).map(approvalElement => approvalElement.Score);
+        const SRF_HSEDiagnosticLine = responses[17].data;
+        const SRF_HSEApprovalLineEntity = responses[14].data;
+        const SRF_HSEDiagnosticLine2 = SRF_HSEDiagnosticLine.value.map(item => {
+          const approvalList = (SRF_HSEApprovalLineEntity.value.filter(approvalElement => approvalElement.IdApproval === item.IdApproval && approvalElement.dataAreaId === item.dataAreaId)).map(approvalElement => approvalElement.Score);
           return {
             ...item, 
             MaxScore: Math.max(...approvalList),
@@ -122,26 +122,26 @@ router.post('/', async(req, res) => {
         }
 
         const _data = {
-          Companies: responses[0].data.value,
-          SRFSecurityRoles: responses[1].data.value,
-          SRF_HSEZones: responses[2].data.value,
-          SRF_HSEZonesLineEntity: responses[3].data.value,
-          SRF_HSEProcessLineEntity: responses[4].data.value,
-          SRF_HSEActivities_LineEntity: responses[5].data.value,
-          SRF_HSEImmediateBasicCauses: responses[6].data.value,
-          SRF_HSEObjectDamage: responses[7].data.value,
-          SRF_HSEPropertyType: responses[8].data.value,
-          SRF_HSEHarmLevelsEntity: responses[9].data.value,
+          Companies: responses[0].data,
+          SRFSecurityRoles: responses[1].data,
+          SRF_HSEZones: responses[2].data,
+          SRF_HSEZonesLineEntity: responses[3].data,
+          SRF_HSEProcessLineEntity: responses[4].data,
+          SRF_HSEActivities_LineEntity: responses[5].data,
+          SRF_HSEImmediateBasicCauses: responses[6].data,
+          SRF_HSEObjectDamage: responses[7].data,
+          SRF_HSEPropertyType: responses[8].data,
+          SRF_HSEHarmLevelsEntity: responses[9].data,
           SRF_HSEUnsafeConditionsReport: responses[10].data,
           SRF_HSEEventDetails: responses[11].data,
           SRF_HSEEventCauses: responses[12].data,
-          SRF_HSEPotentialEventDamage: responses[13].data.value,
+          SRF_HSEPotentialEventDamage: responses[13].data,
           SRF_HSEApprovalLineEntity,
-          SRF_HSEItemsEvaluateEntity: responses[15].data.value,
-          SRF_HSEDiagnosticEntity: responses[16].data.value,
+          SRF_HSEItemsEvaluateEntity: responses[15].data,
+          SRF_HSEDiagnosticEntity: responses[16].data,
           SRF_HSEDiagnosticLine,
-          SRF_HSEComplianceEvidencesEntity: responses[18].data.value,
-          SRF_HSEImprovementOpportunities: responses[19].data.value,
+          SRF_HSEComplianceEvidencesEntity: responses[18].data,
+          SRF_HSEImprovementOpportunities: responses[19].data,
           SRF_HSEDiagnosticLine2,
           SRF_HSE_WorkerEntity,
           PersonUsers,
