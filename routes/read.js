@@ -51,7 +51,7 @@ router.post('/', async(req, res) => {
     }
 
     const Entity1 = axios.get(`${tenant}/data/Companies?$format=application/json;odata.metadata=none${ numberOfElements ? "&$top=" + numberOfElements : ""}&cross-company=true`, { headers: {'Authorization': "Bearer " + token}});
-    const Entity2 = axios.get(`${tenant}/data/SRFSecurityRoles?$format=application/json;odata.metadata=none${ numberOfElements ? "&$top=" + numberOfElements : ""}&cross-company=true`, { headers: {'Authorization': "Bearer " + token}});
+    const Entity2 = axios.get(`${tenant}/data/SRFSecurityRoles?$format=application/json;odata.metadata=none${ numberOfElements ? "&$top=" + numberOfElements : ""}&cross-company=true&$filter=Email eq '${userEmail}'`, { headers: {'Authorization': "Bearer " + token}});
     const Entity3 = axios.get(`${tenant}/data/SRF_HSEZones?$format=application/json;odata.metadata=none${ numberOfElements ? "&$top=" + numberOfElements : ""}&cross-company=true`, { headers: {'Authorization': "Bearer " + token}});
     const Entity4 = axios.get(`${tenant}/data/SRF_HSEZonesLineEntity?$format=application/json;odata.metadata=none${ numberOfElements ? "&$top=" + numberOfElements : ""}&cross-company=true`, { headers: {'Authorization': "Bearer " + token}});
     const Entity5 = axios.get(`${tenant}/data/SRF_HSEProcessLineEntity?$format=application/json;odata.metadata=none${ numberOfElements ? "&$top=" + numberOfElements : ""}&cross-company=true`, { headers: {'Authorization': "Bearer " + token}});
@@ -70,11 +70,16 @@ router.post('/', async(req, res) => {
     const Entity18 = axios.get(`${tenant}/data/SRF_HSEDiagnosticLine?$format=application/json;odata.metadata=none${ numberOfElements ? "&$top=" + numberOfElements : ""}&cross-company=true`, { headers: {'Authorization': "Bearer " + token}});
     const Entity19 = axios.get(`${tenant}/data/SRF_HSEComplianceEvidencesEntity?$format=application/json;odata.metadata=none${ numberOfElements ? "&$top=" + numberOfElements : ""}&cross-company=true`, { headers: {'Authorization': "Bearer " + token}});
     const Entity20 = axios.get(`${tenant}/data/SRF_HSEImprovementOpportunities?$format=application/json;odata.metadata=none${ numberOfElements ? "&$top=" + numberOfElements : ""}&cross-company=true`, { headers: {'Authorization': "Bearer " + token}});
-
-      await axios.all([Entity1, Entity2, Entity3, Entity4,Entity5, Entity6, Entity7, Entity8, Entity9, Entity10, Entity11, Entity12, Entity13, Entity14, Entity15, Entity16, Entity17, Entity18, Entity19, Entity20]).then(axios.spread(async (...responses) => {
+    const Entity21 = axios.get(`${tenant}/data/SRF_HcmWorkerEntity?$format=application/json;odata.metadata=none${ numberOfElements ? "&$top=" + numberOfElements : ""}&cross-company=true&$select=Name,PersonnelNumber,Locator,DataArea`, { headers: {'Authorization': "Bearer " + token}});
+    const Entity22 = axios.get(`${tenant}/data/PersonUsers?$format=application/json;odata.metadata=none${ numberOfElements ? "&$top=" + numberOfElements : ""}&cross-company=true&$filter=UserEmail eq '${userEmail}'`, { headers: {'Authorization': "Bearer " + token}});
+    const Entity23 = axios.get(`${tenant}/data/HcmWorkers?$format=application/json;odata.metadata=none${ numberOfElements ? "&$top=" + numberOfElements : ""}&cross-company=true`, { headers: {'Authorization': "Bearer " + token}});
+    
+      await axios.all([Entity1, Entity2, Entity3, Entity4,Entity5, Entity6, Entity7, Entity8, Entity9, Entity10, Entity11, Entity12, Entity13, Entity14, Entity15, Entity16, Entity17, Entity18, Entity19, Entity20, Entity21, Entity22, Entity23]).then(axios.spread(async (...responses) => {
         
-        const SRF_HSEDiagnosticLine2 = responses[17].data.value.map(item => {
-          const approvalList = (responses[14].data.value.filter(approvalElement => approvalElement.IdApproval === item.IdApproval && approvalElement.dataAreaId === item.dataAreaId)).map(approvalElement => approvalElement.Score);
+        const SRF_HSEDiagnosticLine = responses[17].data.value;
+        const SRF_HSEApprovalLineEntity = responses[14].data.value;
+        const SRF_HSEDiagnosticLine2 = SRF_HSEDiagnosticLine.map(item => {
+          const approvalList = (SRF_HSEApprovalLineEntity.filter(approvalElement => approvalElement.IdApproval === item.IdApproval && approvalElement.dataAreaId === item.dataAreaId)).map(approvalElement => approvalElement.Score);
           return {
             ...item, 
             MaxScore: Math.max(...approvalList),
@@ -82,28 +87,65 @@ router.post('/', async(req, res) => {
           }
         });
 
+        const SRF_HcmWorkerEntity = responses[20].data.value;
+        let SRF_HSE_WorkerEntity = [];
+
+        for (let i = 0; i < SRF_HcmWorkerEntity.length; i++) {
+          const element1 = SRF_HcmWorkerEntity[i];
+          let exists = false;
+          
+          for (let j = 0; j < SRF_HSE_WorkerEntity.length; j++) {
+            const element2 = SRF_HSE_WorkerEntity[j];
+            
+            if(element2.Name === element1.Name &&  element2.PersonnelNumber === element1.PersonnelNumber && element2.DataArea === element1.DataArea){
+              exists=true;
+              break;
+            }
+          }
+
+          if(!exists){
+            SRF_HSE_WorkerEntity.push(element1);
+          }
+        }
+
+        const _PersonUsers = responses[21].data.value;
+        let PersonUsers = {};
+        let HcmWorkers = {};
+
+        if(_PersonUsers.length > 0){
+          PersonUsers = _PersonUsers[0];
+          const _HcmWorkers = responses[22].data.value.filter(item => item.DirPerson_FK_PartyNumber === PersonUsers.PartyNumber);
+
+          if(_HcmWorkers.length > 0){
+            HcmWorkers = _HcmWorkers[0];
+          }
+        }
+
         const _data = {
-          Companies: responses[0].data,
-          SRFSecurityRoles: responses[1].data,
-          SRF_HSEZones: responses[2].data,
-          SRF_HSEZonesLineEntity: responses[3].data,
-          SRF_HSEProcessLineEntity: responses[4].data,
-          SRF_HSEActivities_LineEntity: responses[5].data,
-          SRF_HSEImmediateBasicCauses: responses[6].data,
-          SRF_HSEObjectDamage: responses[7].data,
-          SRF_HSEPropertyType: responses[8].data,
-          SRF_HSEHarmLevelsEntity: responses[9].data,
-          SRF_HSEUnsafeConditionsReport: responses[10].data,
-          SRF_HSEEventDetails: responses[11].data,
-          SRF_HSEEventCauses: responses[12].data,
-          SRF_HSEPotentialEventDamage: responses[13].data,
-          SRF_HSEApprovalLineEntity: responses[14].data,
-          SRF_HSEItemsEvaluateEntity: responses[15].data,
-          SRF_HSEDiagnosticEntity: responses[16].data,
-          SRF_HSEDiagnosticLine: responses[17].data,
-          SRF_HSEComplianceEvidencesEntity: responses[18].data,
-          SRF_HSEImprovementOpportunities: responses[19].data,
-          SRF_HSEDiagnosticLine2: SRF_HSEDiagnosticLine2
+          Companies: responses[0].data.value,
+          SRFSecurityRoles: responses[1].data.value,
+          SRF_HSEZones: responses[2].data.value,
+          SRF_HSEZonesLineEntity: responses[3].data.value,
+          SRF_HSEProcessLineEntity: responses[4].data.value,
+          SRF_HSEActivities_LineEntity: responses[5].data.value,
+          SRF_HSEImmediateBasicCauses: responses[6].data.value,
+          SRF_HSEObjectDamage: responses[7].data.value,
+          SRF_HSEPropertyType: responses[8].data.value,
+          SRF_HSEHarmLevelsEntity: responses[9].data.value,
+          SRF_HSEUnsafeConditionsReport: responses[10].data.value,
+          SRF_HSEEventDetails: responses[11].data.value,
+          SRF_HSEEventCauses: responses[12].data.value,
+          SRF_HSEPotentialEventDamage: responses[13].data.value,
+          SRF_HSEApprovalLineEntity,
+          SRF_HSEItemsEvaluateEntity: responses[15].data.value,
+          SRF_HSEDiagnosticEntity: responses[16].data.value,
+          SRF_HSEDiagnosticLine,
+          SRF_HSEComplianceEvidencesEntity: responses[18].data.value,
+          SRF_HSEImprovementOpportunities: responses[19].data.value,
+          SRF_HSEDiagnosticLine2,
+          SRF_HSE_WorkerEntity,
+          PersonUsers,
+          HcmWorkers
         };
 
         await client.set(
