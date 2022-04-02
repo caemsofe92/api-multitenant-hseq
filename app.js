@@ -6,9 +6,9 @@ const compression = require('compression')
 var indexRouter = require('./routes/index');
 var entitiesRouter = require('./routes/entities');
 var createRouter = require('./routes/create');
-var readRouter = require('./routes/read');
-var updateRouter = require('./routes/update');
-var deleteRouter = require('./routes/delete');
+var getHome = require('./routes/get-home');
+var getRaic = require('./routes/get-raic');
+var getDiagnostic = require('./routes/get-diagnostic');
 var specialRouter = require('./routes/special');
 
 var app = express();
@@ -20,9 +20,9 @@ app.use(express.urlencoded({ extended: false }));
 app.use('/', indexRouter);
 app.use('/entities', entitiesRouter);
 app.use('/create', createRouter);
-app.use('/read', readRouter);
-app.use('/update', updateRouter);
-app.use('/delete', deleteRouter);
+app.use('/get-home', getHome);
+app.use('/get-raic', getRaic);
+app.use('/get-diagnostic', getDiagnostic);
 app.use('/special', specialRouter);
 
 app.use(function(req, res, next) {
