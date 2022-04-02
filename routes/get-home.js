@@ -13,21 +13,9 @@ router.post('/', async(req, res) => {
     const refresh = (req.query.refresh || (req.body && req.body.refresh));
     const userEmail = (req.query.userEmail || (req.body && req.body.userEmail));
     
-    let mainReply;
-    let userReply;
-
-    let _mainReply;
-    let _userReply;
-
     if(!refresh){
-      _mainReply = await client.get(entity);
-      _userReply = await client.get(entity + userEmail);
-
-      if (_mainReply && _userReply){ 
-        mainReply = JSON.parse(_mainReply);
-        userReply = JSON.parse(_userReply);
-        return res.json({response: {...mainReply, ...userReply}});
-      }
+      const userReply = await client.get(entity + userEmail);
+      if (userReply) return res.json({response: JSON.parse(userReply)});
     }
 
     let token = await client.get(tenant);
@@ -53,16 +41,19 @@ router.post('/', async(req, res) => {
       };
       await axios(optionsToken);
     }
-
-    if(!_mainReply){
-    const Entity1 = axios.get(`${tenant}/data/SRF_HSEUnsafeConditionsReport?$format=application/json;odata.metadata=none${ numberOfElements ? "&$top=" + numberOfElements : ""}&cross-company=true`, { headers: {'Authorization': "Bearer " + token}});
-    const Entity2 = axios.get(`${tenant}/data/SRF_HSEDiagnosticEntity?$format=application/json;odata.metadata=none${ numberOfElements ? "&$top=" + numberOfElements : ""}&cross-company=true`, { headers: {'Authorization': "Bearer " + token}});
     
-      await axios.all([Entity1, Entity2]).then(axios.spread(async (...responses) => {
-        mainReply = {
-          SRF_HSEUnsafeConditionsReport: responses[0].data,
-          SRF_HSEDiagnosticEntity: responses[1].data
-        };
+    let _mainReply;
+    let mainReply;
+
+    if(!refresh){
+      _mainReply = await client.get(entity);
+    }
+
+    if(!_mainReply || refresh){
+      const Entity1 = axios.get(`${tenant}/data/HcmWorkers?$format=application/json;odata.metadata=none&cross-company=true&$select=DirPerson_FK_PartyNumber,PersonnelNumber`, { headers: {'Authorization': "Bearer " + token}});
+    
+      await axios.all([Entity1]).then(axios.spread(async (...responses) => {
+        mainReply = responses[0].data.value;
 
         await client.set(
           entity,
@@ -72,29 +63,29 @@ router.post('/', async(req, res) => {
           }
         );
       }));
+    }else{
+      mainReply = JSON.parse(_mainReply);
     }
 
-    if(!_userReply){
     const Entity1 = axios.get(`${tenant}/data/SRFSecurityRoles?$format=application/json;odata.metadata=none${ numberOfElements ? "&$top=" + numberOfElements : ""}&cross-company=true&$filter=Email eq '${userEmail}'&$select=Name,company`, { headers: {'Authorization': "Bearer " + token}});
-    const Entity2 = axios.get(`${tenant}/data/HcmWorkers?$format=application/json;odata.metadata=none&cross-company=true&$select=DirPerson_FK_PartyNumber,PersonnelNumber`, { headers: {'Authorization': "Bearer " + token}});
-    const Entity3 = axios.get(`${tenant}/data/PersonUsers?$format=application/json;odata.metadata=none${ numberOfElements ? "&$top=" + numberOfElements : ""}&cross-company=true&$filter=UserEmail eq '${userEmail}'&$select=PersonName,PartyNumber`, { headers: {'Authorization': "Bearer " + token}});
+    const Entity2 = axios.get(`${tenant}/data/PersonUsers?$format=application/json;odata.metadata=none${ numberOfElements ? "&$top=" + numberOfElements : ""}&cross-company=true&$filter=UserEmail eq '${userEmail}'&$select=PersonName,PartyNumber`, { headers: {'Authorization': "Bearer " + token}});
     
-      await axios.all([Entity1, Entity2, Entity3]).then(axios.spread(async (...responses) => {
+      await axios.all([Entity1, Entity2]).then(axios.spread(async (...responses) => {
 
-        const _PersonUsers = responses[2].data.value;
+        const _PersonUsers = responses[1].data.value;
         let PersonUsers = {};
         let HcmWorkers = {};
 
         if(_PersonUsers.length > 0){
           PersonUsers = _PersonUsers[0];
-          const _HcmWorkers = responses[1].data.value.filter(item => item.DirPerson_FK_PartyNumber === PersonUsers.PartyNumber);
+          const _HcmWorkers = mainReply.filter(item => item.DirPerson_FK_PartyNumber === PersonUsers.PartyNumber);
 
           if(_HcmWorkers.length > 0){
             HcmWorkers = _HcmWorkers[0];
           }
         }
 
-        userReply = {
+        const userReply = {
           SRFSecurityRoles: responses[0].data,
           HcmWorkers,
           PersonUsers
@@ -107,10 +98,9 @@ router.post('/', async(req, res) => {
             EX: 3599,
           }
         );
-      }));
-    }
 
-    return res.json({response: {...mainReply, ...userReply}});
+        return res.json({response: userReply});
+      }));
 });
 
 module.exports = router;
