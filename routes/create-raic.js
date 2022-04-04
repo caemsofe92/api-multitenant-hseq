@@ -52,7 +52,10 @@ router.post('/', async(req, res) => {
     await axios({
       method: 'post',
       url: `${tenant}/data/SRF_HSEUnsafeConditionsReport?$format=application/json;odata.metadata=none`,
-      data: unsafeCondition,
+      data: {
+        ...unsafeCondition,
+        Responsible: unsafeCondition.Responsible.toString()
+      },
       headers: {'Authorization': "Bearer " + token},
       transformResponse: [async dataUnsafeCondition => {
         _unsafeCondition = JSON.parse(dataUnsafeCondition);
