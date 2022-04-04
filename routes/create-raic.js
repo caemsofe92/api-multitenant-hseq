@@ -46,6 +46,8 @@ router.post('/', async(req, res) => {
     let _eventCauses = [];
     let _potentialEventDamage = [];
 
+    try {
+
     if(unsafeCondition){
     await axios({
       method: 'post',
@@ -140,6 +142,9 @@ router.post('/', async(req, res) => {
       }]
     });
   }
+} catch (error) {
+      res.send(error);
+}
 });
 
 module.exports = router;
