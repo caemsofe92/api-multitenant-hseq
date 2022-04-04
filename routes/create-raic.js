@@ -1,6 +1,5 @@
 let express = require('express');
 let router = express.Router();
-let moment = require('moment');
 const axios = require("axios");
 const client = require('../bin/redis-client');
 
