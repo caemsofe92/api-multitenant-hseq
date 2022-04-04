@@ -138,8 +138,26 @@ router.post('/', async(req, res) => {
             });
           }]
         });
+      }else{
+        return res.send({
+          _unsafeCondition,
+          _improvementOpportunities,
+          _eventDetails,
+          _eventCauses,
+          _potentialEventDamage,
+          _evidences: evidences
+        });
       }
       }]
+    });
+  }else{
+    return res.send({
+      _unsafeCondition,
+      _improvementOpportunities,
+      _eventDetails,
+      _eventCauses,
+      _potentialEventDamage,
+      _evidences: evidences
     });
   }
 } catch (error) {
