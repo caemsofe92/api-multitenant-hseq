@@ -1,9 +1,11 @@
 let express = require('express');
 let router = express.Router();
+let moment = require('moment');
 const axios = require("axios");
 const client = require('../bin/redis-client');
 
 router.post('/', async(req, res) => {
+    console.log(req.body);
     const tenantUrl = (req.query.tenantUrl || (req.body && req.body.tenantUrl));
     const clientId = (req.query.clientId || (req.body && req.body.clientId));
     const clientSecret = (req.query.clientSecret || (req.body && req.body.clientSecret));
@@ -47,7 +49,6 @@ router.post('/', async(req, res) => {
     let _potentialEventDamage = [];
 
     try {
-
     if(unsafeCondition){
     await axios({
       method: 'post',
@@ -67,6 +68,7 @@ router.post('/', async(req, res) => {
         if(improvementOpportunities){
           const __improvementOpportunities = await axios.post(`${tenant}/api/services/SRF_HSEDocuRefServicesGroup/SRF_HSEDocuRefServices/createOpportunities`, 
           {
+            ...improvementOpportunities,
             _dataAreaId: _unsafeCondition.dataAreaId,
             _idOrigin: _unsafeCondition.SRF_HSEIdUnsafeCondition,
             _detectionDate: _unsafeCondition.UtcDrawingDate,
@@ -74,8 +76,7 @@ router.post('/', async(req, res) => {
             _state: 0,
             _hcmEmploymentType: 0,
             _origin: 8,
-            _tableID: 20371,
-            ...improvementOpportunities
+            _tableID: 20371
           }, 
           { 
             headers: {'Authorization': "Bearer " + token}
@@ -164,7 +165,8 @@ router.post('/', async(req, res) => {
     });
   }
 } catch (error) {
-      res.send(error);
+      console.error(error.message);
+      res.send({error: error.message});
 }
 });
 
