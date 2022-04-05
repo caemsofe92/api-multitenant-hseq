@@ -112,7 +112,7 @@ router.post("/", async (req, res) => {
       numberOfElements ? "&$top=" + numberOfElements : ""
     }&cross-company=true${
       userCompany ? `&$filter=dataAreaId eq '${userCompany}'` : ""
-    }`,
+    }&$orderby=UtcDrawingDate desc`,
     { headers: { Authorization: "Bearer " + token } }
   );
   const Entity10 = axios.get(
