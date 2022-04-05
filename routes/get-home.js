@@ -55,7 +55,7 @@ router.post("/", async (req, res) => {
       { headers: { Authorization: "Bearer " + token } }
     );
 
-    await axios.all([Entity1, Entity2]).then(
+    await axios.all([Entity1]).then(
       axios.spread(async (...responses) => {
         mainReply = responses[0].data.value;
 
@@ -83,7 +83,7 @@ router.post("/", async (req, res) => {
   const Entity3 = axios.get(
     `${tenant}/data/Companies?$format=application/json;odata.metadata=none${
       numberOfElements ? "&$top=" + numberOfElements : ""
-    }&cross-company=true`,
+    }&cross-company=true&$select=DataArea,Name`,
     { headers: { Authorization: "Bearer " + token } }
   );
 
@@ -105,9 +105,12 @@ router.post("/", async (req, res) => {
       }
 
       const userReply = {
-        SRFSecurityRoles: responses[0].data,
-        HcmWorkers,
-        PersonUsers,
+        SRFSecurityRoles: responses[0].data.value.map(Rol => {return {Name: Rol.Name}}),
+        SRFUserData: {
+          PersonName: PersonUsers.PersonName,
+          PersonnelNumber: HcmWorkers.PersonnelNumber,
+          Company: responses[0].data.value[0].company
+        },
         Companies: responses[2].data,
       };
 
