@@ -105,11 +105,13 @@ router.post("/", async (req, res) => {
       }
 
       const userReply = {
-        SRFSecurityRoles: responses[0].data.value.map(Rol => {return {Name: Rol.Name}}),
+        SRFSecurityRoles: responses[0].data.value.map((Rol) => {
+          return { Name: Rol.Name };
+        }),
         SRFUserData: {
           PersonName: PersonUsers.PersonName,
           PersonnelNumber: HcmWorkers.PersonnelNumber,
-          Company: responses[0].data.value[0].company
+          Company: responses[0].data.value[0].company,
         },
         Companies: responses[2].data,
       };

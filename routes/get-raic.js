@@ -13,9 +13,11 @@ router.post("/", async (req, res) => {
   const numberOfElements =
     req.query.numberOfElements || (req.body && req.body.numberOfElements);
   const refresh = req.query.refresh || (req.body && req.body.refresh);
+  const userCompany =
+    req.query.userCompany || (req.body && req.body.userCompany);
 
   if (!refresh) {
-    const mainReply = await client.get(entity);
+    const mainReply = await client.get(entity + userCompany);
     if (mainReply) return res.json({ response: JSON.parse(mainReply) });
   }
 
@@ -44,79 +46,105 @@ router.post("/", async (req, res) => {
   const Entity1 = axios.get(
     `${tenant}/data/SRF_HSEZones?$format=application/json;odata.metadata=none${
       numberOfElements ? "&$top=" + numberOfElements : ""
-    }&cross-company=true`,
+    }&cross-company=true${
+      userCompany ? `&$filter=dataAreaId eq '${userCompany}'` : ""
+    }`,
     { headers: { Authorization: "Bearer " + token } }
   );
   const Entity2 = axios.get(
     `${tenant}/data/SRF_HSEZonesLineEntity?$format=application/json;odata.metadata=none${
       numberOfElements ? "&$top=" + numberOfElements : ""
-    }&cross-company=true`,
+    }&cross-company=true${
+      userCompany ? `&$filter=dataAreaId eq '${userCompany}'` : ""
+    }`,
     { headers: { Authorization: "Bearer " + token } }
   );
   const Entity3 = axios.get(
     `${tenant}/data/SRF_HSEProcessLineEntity?$format=application/json;odata.metadata=none${
       numberOfElements ? "&$top=" + numberOfElements : ""
-    }&cross-company=true`,
+    }&cross-company=true${
+      userCompany ? `&$filter=dataAreaId eq '${userCompany}'` : ""
+    }`,
     { headers: { Authorization: "Bearer " + token } }
   );
   const Entity4 = axios.get(
     `${tenant}/data/SRF_HSEActivities_LineEntity?$format=application/json;odata.metadata=none${
       numberOfElements ? "&$top=" + numberOfElements : ""
-    }&cross-company=true`,
+    }&cross-company=true${
+      userCompany ? `&$filter=dataAreaId eq '${userCompany}'` : ""
+    }`,
     { headers: { Authorization: "Bearer " + token } }
   );
   const Entity5 = axios.get(
     `${tenant}/data/SRF_HSEImmediateBasicCauses?$format=application/json;odata.metadata=none${
       numberOfElements ? "&$top=" + numberOfElements : ""
-    }&cross-company=true`,
+    }&cross-company=true${
+      userCompany ? `&$filter=dataAreaId eq '${userCompany}'` : ""
+    }`,
     { headers: { Authorization: "Bearer " + token } }
   );
   const Entity6 = axios.get(
     `${tenant}/data/SRF_HSEObjectDamage?$format=application/json;odata.metadata=none${
       numberOfElements ? "&$top=" + numberOfElements : ""
-    }&cross-company=true`,
+    }&cross-company=true${
+      userCompany ? `&$filter=dataAreaId eq '${userCompany}'` : ""
+    }`,
     { headers: { Authorization: "Bearer " + token } }
   );
   const Entity7 = axios.get(
     `${tenant}/data/SRF_HSEPropertyType?$format=application/json;odata.metadata=none${
       numberOfElements ? "&$top=" + numberOfElements : ""
-    }&cross-company=true`,
+    }&cross-company=true${
+      userCompany ? `&$filter=dataAreaId eq '${userCompany}'` : ""
+    }`,
     { headers: { Authorization: "Bearer " + token } }
   );
   const Entity8 = axios.get(
     `${tenant}/data/SRF_HSEHarmLevelsEntity?$format=application/json;odata.metadata=none${
       numberOfElements ? "&$top=" + numberOfElements : ""
-    }&cross-company=true`,
+    }&cross-company=true${
+      userCompany ? `&$filter=dataAreaId eq '${userCompany}'` : ""
+    }`,
     { headers: { Authorization: "Bearer " + token } }
   );
   const Entity9 = axios.get(
     `${tenant}/data/SRF_HSEUnsafeConditionsReport?$format=application/json;odata.metadata=none${
       numberOfElements ? "&$top=" + numberOfElements : ""
-    }&cross-company=true`,
+    }&cross-company=true${
+      userCompany ? `&$filter=dataAreaId eq '${userCompany}'` : ""
+    }`,
     { headers: { Authorization: "Bearer " + token } }
   );
   const Entity10 = axios.get(
     `${tenant}/data/SRF_HSEEventDetails?$format=application/json;odata.metadata=none${
       numberOfElements ? "&$top=" + numberOfElements : ""
-    }&cross-company=true`,
+    }&cross-company=true${
+      userCompany ? `&$filter=dataAreaId eq '${userCompany}'` : ""
+    }`,
     { headers: { Authorization: "Bearer " + token } }
   );
   const Entity11 = axios.get(
     `${tenant}/data/SRF_HSEEventCauses?$format=application/json;odata.metadata=none${
       numberOfElements ? "&$top=" + numberOfElements : ""
-    }&cross-company=true`,
+    }&cross-company=true${
+      userCompany ? `&$filter=dataAreaId eq '${userCompany}'` : ""
+    }`,
     { headers: { Authorization: "Bearer " + token } }
   );
   const Entity12 = axios.get(
     `${tenant}/data/SRF_HSEPotentialEventDamage?$format=application/json;odata.metadata=none${
       numberOfElements ? "&$top=" + numberOfElements : ""
-    }&cross-company=true`,
+    }&cross-company=true${
+      userCompany ? `&$filter=dataAreaId eq '${userCompany}'` : ""
+    }`,
     { headers: { Authorization: "Bearer " + token } }
   );
   const Entity13 = axios.get(
     `${tenant}/data/SRF_HcmWorkerEntity?$format=application/json;odata.metadata=none${
       numberOfElements ? "&$top=" + numberOfElements : ""
-    }&cross-company=true&$select=Name,PersonnelNumber,DataArea`,
+    }&cross-company=true&$select=Name,PersonnelNumber,DataArea${
+      userCompany ? `&$filter=DataArea eq '${userCompany}'` : ""
+    }`,
     { headers: { Authorization: "Bearer " + token } }
   );
 
@@ -179,7 +207,7 @@ router.post("/", async (req, res) => {
           SRF_HSE_WorkerEntity,
         };
 
-        await client.set(entity, JSON.stringify(reply), {
+        await client.set(entity + userCompany, JSON.stringify(reply), {
           EX: 9999999,
         });
         return res.json({ response: reply });

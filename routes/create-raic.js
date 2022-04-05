@@ -183,7 +183,7 @@ router.post("/", async (req, res) => {
       });
     }
   } catch (error) {
-    console.error(error.message);
+    //console.error(error.message);
     return res.send({
       result: false,
       _unsafeCondition,

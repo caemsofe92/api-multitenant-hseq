@@ -13,9 +13,11 @@ router.post("/", async (req, res) => {
   const numberOfElements =
     req.query.numberOfElements || (req.body && req.body.numberOfElements);
   const refresh = req.query.refresh || (req.body && req.body.refresh);
+  const userCompany =
+    req.query.userCompany || (req.body && req.body.userCompany);
 
   if (!refresh) {
-    const mainReply = await client.get(entity);
+    const mainReply = await client.get(entity + userCompany);
     if (mainReply) return res.json({ response: JSON.parse(mainReply) });
   }
 
@@ -42,31 +44,41 @@ router.post("/", async (req, res) => {
   }
 
   const Entity1 = axios.get(
-    `${tenant}/data/SRF_HSEApprovalLineEntity?$format=application/json;odata.metadata=none&cross-company=true`,
+    `${tenant}/data/SRF_HSEApprovalLineEntity?$format=application/json;odata.metadata=none&cross-company=true${
+      userCompany ? `&$filter=dataAreaId eq '${userCompany}'` : ""
+    }`,
     { headers: { Authorization: "Bearer " + token } }
   );
   const Entity2 = axios.get(
     `${tenant}/data/SRF_HSEDiagnosticEntity?$format=application/json;odata.metadata=none${
       numberOfElements ? "&$top=" + numberOfElements : ""
-    }&cross-company=true`,
+    }&cross-company=true${
+      userCompany ? `&$filter=dataAreaId eq '${userCompany}'` : ""
+    }`,
     { headers: { Authorization: "Bearer " + token } }
   );
   const Entity3 = axios.get(
     `${tenant}/data/SRF_HSEDiagnosticLine?$format=application/json;odata.metadata=none${
       numberOfElements ? "&$top=" + numberOfElements : ""
-    }&cross-company=true`,
+    }&cross-company=true${
+      userCompany ? `&$filter=dataAreaId eq '${userCompany}'` : ""
+    }`,
     { headers: { Authorization: "Bearer " + token } }
   );
   const Entity4 = axios.get(
     `${tenant}/data/SRF_HSEComplianceEvidencesEntity?$format=application/json;odata.metadata=none${
       numberOfElements ? "&$top=" + numberOfElements : ""
-    }&cross-company=true`,
+    }&cross-company=true${
+      userCompany ? `&$filter=dataAreaId eq '${userCompany}'` : ""
+    }`,
     { headers: { Authorization: "Bearer " + token } }
   );
   const Entity5 = axios.get(
     `${tenant}/data/SRF_HSEImprovementOpportunities?$format=application/json;odata.metadata=none${
       numberOfElements ? "&$top=" + numberOfElements : ""
-    }&cross-company=true`,
+    }&cross-company=true${
+      userCompany ? `&$filter=dataAreaId eq '${userCompany}'` : ""
+    }`,
     { headers: { Authorization: "Bearer " + token } }
   );
 
@@ -98,7 +110,7 @@ router.post("/", async (req, res) => {
         SRF_HSEDiagnosticLine2,
       };
 
-      await client.set(entity, JSON.stringify(reply), {
+      await client.set(entity + userCompany, JSON.stringify(reply), {
         EX: 9999999,
       });
       return res.json({ response: reply });
