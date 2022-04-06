@@ -14,13 +14,17 @@ router.post("/", async (req, res) => {
     req.query.numberOfElements || (req.body && req.body.numberOfElements);
   const refresh = req.query.refresh || (req.body && req.body.refresh);
   const userEmail = req.query.userEmail || (req.body && req.body.userEmail);
+  const environment =
+    req.query.environment || (req.body && req.body.environment);
+
+  if (!client.isOpen) client.connect();
 
   if (!refresh) {
     const userReply = await client.get(entity + userEmail);
     if (userReply) return res.json({ response: JSON.parse(userReply) });
   }
-  
-  let token = await client.get(tenant);
+
+  let token = await client.get(environment);
 
   if (!token) {
     const optionsToken = {
@@ -32,7 +36,7 @@ router.post("/", async (req, res) => {
         async (data) => {
           const _data = JSON.parse(data);
           token = _data.access_token;
-          await client.set(tenant, _data.access_token, {
+          await client.set(environment, _data.access_token, {
             EX: 3599,
           });
           return data;

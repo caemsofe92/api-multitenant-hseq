@@ -4,7 +4,7 @@ var cookieParser = require('cookie-parser');
 const compression = require('compression')
 
 var indexRouter = require('./routes/index');
-var entitiesRouter = require('./routes/entities');
+var updateRAICRouter = require('./routes/update-raic');
 var createRAICRouter = require('./routes/create-raic');
 var getHome = require('./routes/get-home');
 var getRaic = require('./routes/get-raic');
@@ -18,7 +18,7 @@ app.use(cookieParser());
 app.use(express.urlencoded({ extended: false }));
 
 app.use('/', indexRouter);
-app.use('/entities', entitiesRouter);
+app.use('/update-raic', updateRAICRouter);
 app.use('/create-raic', createRAICRouter);
 app.use('/get-home', getHome);
 app.use('/get-raic', getRaic);

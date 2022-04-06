@@ -15,13 +15,17 @@ router.post("/", async (req, res) => {
   const refresh = req.query.refresh || (req.body && req.body.refresh);
   const userCompany =
     req.query.userCompany || (req.body && req.body.userCompany);
+  const environment =
+    req.query.environment || (req.body && req.body.environment);
+
+  if (!client.isOpen) client.connect();
 
   if (!refresh) {
     const mainReply = await client.get(entity + userCompany);
     if (mainReply) return res.json({ response: JSON.parse(mainReply) });
   }
 
-  let token = await client.get(tenant);
+  let token = await client.get(environment);
 
   if (!token) {
     const optionsToken = {
@@ -33,7 +37,7 @@ router.post("/", async (req, res) => {
         async (data) => {
           const _data = JSON.parse(data);
           token = _data.access_token;
-          await client.set(tenant, _data.access_token, {
+          await client.set(environment, _data.access_token, {
             EX: 3599,
           });
           return data;

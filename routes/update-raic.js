@@ -9,19 +9,20 @@ router.post("/", async (req, res) => {
   const clientSecret =
     req.query.clientSecret || (req.body && req.body.clientSecret);
   const tenant = req.query.tenant || (req.body && req.body.tenant);
-
   const unsafeCondition =
     req.query.unsafeCondition || (req.body && req.body.unsafeCondition);
   const eventDetails =
     req.query.eventDetails || (req.body && req.body.eventDetails);
   const eventCauses =
     req.query.eventCauses || (req.body && req.body.eventCauses);
+  const deleteEventCauses =
+    req.query.eventCauses || (req.body && req.body.eventCauses);
   const potentialEventDamage =
     req.query.potentialEventDamage ||
     (req.body && req.body.potentialEventDamage);
-  const improvementOpportunities =
-    req.query.improvementOpportunities ||
-    (req.body && req.body.improvementOpportunities);
+  const deletePotentialEventDamage =
+    req.query.potentialEventDamage ||
+    (req.body && req.body.potentialEventDamage);
   const evidences = req.query.evidences || (req.body && req.body.evidences);
   const environment =
     req.query.environment || (req.body && req.body.environment);
@@ -50,76 +51,54 @@ router.post("/", async (req, res) => {
     await axios(optionsToken);
   }
 
-  let _unsafeCondition;
-  let _improvementOpportunities;
-  let _eventDetails;
   let _eventCauses = [];
   let _potentialEventDamage = [];
 
   try {
     if (unsafeCondition) {
       await axios({
-        method: "post",
-        url: `${tenant}/data/SRF_HSEUnsafeConditionsReport?$format=application/json;odata.metadata=none`,
+        method: "patch",
+        url: `${tenant}/data/SRF_HSEUnsafeConditionsReport(RecId1=${unsafeCondition.RecId1},dataAreaId='${unsafeCondition.dataAreaId}',WorkerNumber='${unsafeCondition.SRF_HSEIdUnsafeCondition}')?$format=application/json;odata.metadata=none`,
         data: {
           ...unsafeCondition,
           Responsible: unsafeCondition.Responsible.toString(),
         },
         headers: { Authorization: "Bearer " + token },
         transformResponse: [
-          async (dataUnsafeCondition) => {
-            _unsafeCondition = JSON.parse(dataUnsafeCondition);
-            let _improvementOpportunities;
-            let _eventDetails;
+          async () => {
             let _eventCauses = [];
             let _potentialEventDamage = [];
 
-            if (improvementOpportunities) {
-              const __improvementOpportunities = await axios.post(
-                `${tenant}/api/services/SRF_HSEDocuRefServicesGroup/SRF_HSEDocuRefServices/createOpportunities`,
-                {
-                  ...improvementOpportunities,
-                  _dataAreaId: _unsafeCondition.dataAreaId,
-                  _idOrigin: _unsafeCondition.SRF_HSEIdUnsafeCondition,
-                  _detectionDate: _unsafeCondition.UtcDrawingDate,
-                  _refRecId: _unsafeCondition.RecId1,
-                  _state: 0,
-                  _hcmEmploymentType: 0,
-                  _origin: 8,
-                  _tableID: 20371,
-                },
-                {
-                  headers: { Authorization: "Bearer " + token },
-                }
-              );
-              _improvementOpportunities = __improvementOpportunities.data;
-            }
-
             if (eventDetails) {
               await axios({
-                method: "post",
-                url: `${tenant}/data/SRF_HSEEventDetails?$format=application/json;odata.metadata=none`,
-                data: {
-                  dataAreaId: _unsafeCondition.dataAreaId,
-                  SRF_HSEIdUnsafeCondition:
-                    _unsafeCondition.SRF_HSEIdUnsafeCondition,
-                  ...eventDetails,
-                },
+                method: "patch",
+                url: `${tenant}/data/SRF_HSEEventDetails(RecId1=${eventDetails.RecId1},dataAreaId='${eventDetails.dataAreaId}',SRF_HSEIdUnsafeCondition='${eventDetails.SRF_HSEIdUnsafeCondition}')?cross-company=true&$format=application/json;odata.metadata=none`,
+                data: eventDetails,
                 headers: { Authorization: "Bearer " + token },
                 transformResponse: [
-                  async (dataEventDetails) => {
-                    _eventDetails = JSON.parse(dataEventDetails);
+                  async () => {
+                    if (deleteEventCauses && deleteEventCauses.length > 0) {
+                      for (let i = 0; i < deleteEventCauses.length; i++) {
+                        const cause = deleteEventCauses[i];
+                        await axios.delete(
+                          `${tenant}/data/SRF_HSEEventCauses(RecId1=${cause.RecId1},dataAreaId='${eventDetails.dataAreaId}',SRF_HSEIdUnsafeCondition='${eventDetails.SRF_HSEIdUnsafeCondition}',IdCausal='${cause.IdCausal}')?cross-company=true`,
+                          {
+                            headers: { Authorization: "Bearer " + token },
+                          }
+                        );
+                      }
+                    }
 
-                    if (eventCauses) {
+                    if (eventCauses && eventCauses.length > 0) {
                       for (let i = 0; i < eventCauses.length; i++) {
                         const cause = eventCauses[i];
                         const causeResponse = await axios.post(
                           `${tenant}/data/SRF_HSEEventCauses?$format=application/json;odata.metadata=none`,
                           {
-                            dataAreaId: _eventDetails.dataAreaId,
+                            dataAreaId: eventDetails.dataAreaId,
                             SRF_HSEIdUnsafeCondition:
-                              _eventDetails.SRF_HSEIdUnsafeCondition,
-                            RefRecid: _eventDetails.RecId1,
+                              eventDetails.SRF_HSEIdUnsafeCondition,
+                            RefRecid: eventDetails.RecId1,
                             ...cause,
                           },
                           {
@@ -129,16 +108,39 @@ router.post("/", async (req, res) => {
                         _eventCauses.push(causeResponse.data);
                       }
                     }
-                    if (potentialEventDamage) {
+
+                    if (
+                      deletePotentialEventDamage &&
+                      deletePotentialEventDamage.length > 0
+                    ) {
+                      for (
+                        let i = 0;
+                        i < deletePotentialEventDamage.length;
+                        i++
+                      ) {
+                        const damage = deletePotentialEventDamage[i];
+                        await axios.delete(
+                          `${tenant}/data/SRF_HSEPotentialEventDamage(RecId1=${damage.RecId1},dataAreaId='${eventDetails.dataAreaId}')?cross-company=true`,
+                          {
+                            headers: { Authorization: "Bearer " + token },
+                          }
+                        );
+                      }
+                    }
+
+                    if (
+                      potentialEventDamage &&
+                      potentialEventDamage.length > 0
+                    ) {
                       for (let i = 0; i < potentialEventDamage.length; i++) {
                         const damage = potentialEventDamage[i];
                         const damageResponse = await axios.post(
                           `${tenant}/data/SRF_HSEPotentialEventDamage?$format=application/json;odata.metadata=none`,
                           {
-                            dataAreaId: _eventDetails.dataAreaId,
+                            dataAreaId: eventDetails.dataAreaId,
                             SRF_HSEIdUnsafeCondition:
-                              _eventDetails.SRF_HSEIdUnsafeCondition,
-                            RefRecid: _eventDetails.RecId1,
+                              eventDetails.SRF_HSEIdUnsafeCondition,
+                            RefRecid: eventDetails.RecId1,
                             ...damage,
                           },
                           {
@@ -150,9 +152,6 @@ router.post("/", async (req, res) => {
                     }
                     return res.send({
                       result: true,
-                      _unsafeCondition,
-                      _improvementOpportunities,
-                      _eventDetails,
                       _eventCauses,
                       _potentialEventDamage,
                       _evidences: evidences,
@@ -163,9 +162,6 @@ router.post("/", async (req, res) => {
             } else {
               return res.send({
                 result: true,
-                _unsafeCondition,
-                _improvementOpportunities,
-                _eventDetails,
                 _eventCauses,
                 _potentialEventDamage,
                 _evidences: evidences,
@@ -177,9 +173,6 @@ router.post("/", async (req, res) => {
     } else {
       return res.send({
         result: true,
-        _unsafeCondition,
-        _improvementOpportunities,
-        _eventDetails,
         _eventCauses,
         _potentialEventDamage,
         _evidences: evidences,
@@ -188,9 +181,6 @@ router.post("/", async (req, res) => {
   } catch (error) {
     return res.send({
       result: false,
-      _unsafeCondition,
-      _improvementOpportunities,
-      _eventDetails,
       _eventCauses,
       _potentialEventDamage,
       _evidences: evidences,
