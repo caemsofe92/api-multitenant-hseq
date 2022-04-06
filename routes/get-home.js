@@ -19,7 +19,7 @@ router.post("/", async (req, res) => {
     const userReply = await client.get(entity + userEmail);
     if (userReply) return res.json({ response: JSON.parse(userReply) });
   }
-
+  
   let token = await client.get(tenant);
 
   if (!token) {
