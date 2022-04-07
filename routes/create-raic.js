@@ -70,9 +70,6 @@ router.post("/", async (req, res) => {
           async (dataUnsafeCondition) => {
             _unsafeCondition = JSON.parse(dataUnsafeCondition);
             let _improvementOpportunities;
-            let _eventDetails;
-            let _eventCauses = [];
-            let _potentialEventDamage = [];
 
             if (improvementOpportunities) {
               const __improvementOpportunities = await axios.post(
