@@ -12,6 +12,9 @@ router.post("/", async (req, res) => {
   const diagnostic = req.query.diagnostic || (req.body && req.body.diagnostic);
   const diagnosticLine =
     req.query.diagnosticLine || (req.body && req.body.diagnosticLine);
+  const improvementOpportunities =
+    req.query.improvementOpportunities ||
+    (req.body && req.body.improvementOpportunities);
   const evidences = req.query.evidences || (req.body && req.body.evidences);
   const environment =
     req.query.environment || (req.body && req.body.environment);
@@ -56,37 +59,36 @@ router.post("/", async (req, res) => {
     if (diagnosticLine && diagnosticLine.length > 0) {
       for (let i = 0; i < diagnosticLine.length; i++) {
         const line = diagnosticLine[i];
-        let opportunityResponse;
-        if (line.improvementOpportunity) {
-            opportunityResponse = await axios.post(
-              `${tenant}/api/services/SRF_HSEDocuRefServicesGroup/SRF_HSEDocuRefServices/createOpportunities`,
-              {
-                _refRecId: line.RecId1,
-                _description: line.improvementOpportunity,
-                _dataAreaId: diagnostic.dataAreaId,
-                _idOrigin: diagnostic.SRF_HSEIdDiagnostic,
-                _detectionDate: diagnostic.ExecutionDate,
-                _state: 0,
-                _hcmEmploymentType: 0,
-                _origin: 1,
-                _tableID: 17070,
-              },
-              {
-                headers: { Authorization: "Bearer " + token },
-              }
-            );
-            _improvementOpportunities.push(opportunityResponse.data);
-        }
         await axios.patch(
           `${tenant}/data/SRF_HSEDiagnosticLine(dataAreaId='${diagnostic.dataAreaId}',SRF_HSEIdDiagnostic='${diagnostic.SRF_HSEIdDiagnostic}',RecId1=${line.RecId1},Line=${line.Line})?cross-company=true`,
+          line,
           {
-            ...line,
-            improvementOpportunity: undefined
+            headers: { Authorization: "Bearer " + token },
+          }
+        );
+      }
+    }
+
+    if (improvementOpportunities && improvementOpportunities.length > 0) {
+      for (let i = 0; i < improvementOpportunities.length; i++) {
+        const opportunity = improvementOpportunities[i];
+        const opportunityResponse = await axios.post(
+          `${tenant}/api/services/SRF_HSEDocuRefServicesGroup/SRF_HSEDocuRefServices/createOpportunities`,
+          {
+            ...opportunity,
+            _dataAreaId: diagnostic.dataAreaId,
+            _idOrigin: diagnostic.SRF_HSEIdDiagnostic,
+            _detectionDate: diagnostic.ExecutionDate,
+            _state: 0,
+            _hcmEmploymentType: 0,
+            _origin: 1,
+            _tableID: 17070,
           },
           {
             headers: { Authorization: "Bearer " + token },
           }
         );
+        _improvementOpportunities.push(opportunityResponse.data);
       }
     }
 
