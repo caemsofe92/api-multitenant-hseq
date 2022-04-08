@@ -27,15 +27,6 @@ const client = createClient({
 client.on("error", () => {
   client.disconnect();
 });
-client.on("connect", () => {
-  console.log("Redis Conectado");
-});
-client.on("end", () => {
-  console.log("Conexión Cerrada con Redis");
-});
-client.on("reconnecting", (o) => {
-  console.log("Reconectano con Redis", o.attempt, o.delay);
-});
 
 if (!client.isOpen) client.connect();
 
