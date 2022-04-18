@@ -339,7 +339,7 @@ router.post("/", async (req, res) => {
       _eventCauses,
       _deletePotentialEventDamage,
       _potentialEventDamage,
-      _evidences: evidences,
+      _evidences: []
     });
   } catch (error) {
     return res.json({

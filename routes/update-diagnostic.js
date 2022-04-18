@@ -185,7 +185,7 @@ router.post("/", async (req, res) => {
       _diagnostic,
       _diagnosticLine,
       _improvementOpportunities,
-      _evidences: evidences,
+      _evidences: []
     });
   } catch (error) {
     return res.json({
