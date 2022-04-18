@@ -138,7 +138,7 @@ router.post("/", async (req, res) => {
             PersonnelNumber: HcmWorkers.PersonnelNumber,
             Company: responses[0].data.value[0].company,
           },
-          Companies: responses[2].data,
+          Companies: responses[2].data.value,
         };
 
         await client.set(entity + userEmail, JSON.stringify(userReply), {
