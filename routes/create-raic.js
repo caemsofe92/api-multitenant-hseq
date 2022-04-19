@@ -83,10 +83,7 @@ router.post("/", async (req, res) => {
         {
           ...unsafeCondition,
           Responsible: unsafeCondition.Responsible.toString(),
-          UtcDrawingDate: moment(unsafeCondition.UtcDrawingDate).add(
-            5,
-            "hours"
-          ),
+          UtcDrawingDate: moment(unsafeCondition.UtcDrawingDate).add(5, 'hours')
         },
         { headers: { Authorization: "Bearer " + token } }
       )
@@ -106,13 +103,7 @@ router.post("/", async (req, res) => {
         }
       });
 
-    _unsafeCondition = {
-      ..._unsafeCondition.data,
-      UtcDrawingDate: moment(_unsafeCondition.data.UtcDrawingDate).subtract(
-        5,
-        "hours"
-      ),
-    };
+    _unsafeCondition = _unsafeCondition.data;
 
     let _improvementOpportunity;
 
@@ -163,7 +154,7 @@ router.post("/", async (req, res) => {
             dataAreaId: _unsafeCondition.dataAreaId,
             SRF_HSEIdUnsafeCondition: _unsafeCondition.SRF_HSEIdUnsafeCondition,
             ...eventDetails,
-            EventDate2: moment(eventDetails.EventDate2).add(5, "hours"),
+            EventDate2: moment(eventDetails.EventDate2).add(5, 'hours')
           },
           {
             headers: { Authorization: "Bearer " + token },
@@ -184,10 +175,7 @@ router.post("/", async (req, res) => {
             throw new Error("Error", error.message);
           }
         });
-      _eventDetails = {
-        ..._eventDetails.data,
-        EventDate2: moment(_eventDetails.data.EventDate2).subtract(5, "hours"),
-      };
+      _eventDetails = _eventDetails.data;
     }
 
     let _eventCauses = [];
@@ -203,7 +191,7 @@ router.post("/", async (req, res) => {
               SRF_HSEIdUnsafeCondition: _eventDetails.SRF_HSEIdUnsafeCondition,
               RefRecid: _eventDetails.RecId1,
               ...cause,
-              Description: undefined,
+              Description:undefined
             },
             {
               headers: { Authorization: "Bearer " + token },
