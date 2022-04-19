@@ -339,10 +339,10 @@ router.post("/", async (req, res) => {
       _eventCauses,
       _deletePotentialEventDamage,
       _potentialEventDamage,
-      _evidences: []
+      _evidences: [],
     });
   } catch (error) {
-    return res.json({
+    return res.status(500).json({
       result: false,
       message: error.toString(),
     });

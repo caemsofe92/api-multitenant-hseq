@@ -173,7 +173,7 @@ router.post("/", async (req, res) => {
         }
       });
   } catch (error) {
-    return res.json({
+    return res.status(500).json({
       result: false,
       message: error.toString(),
     });
