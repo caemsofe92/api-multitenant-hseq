@@ -83,7 +83,11 @@ router.post("/", async (req, res) => {
         {
           ...unsafeCondition,
           Responsible: unsafeCondition.Responsible.toString(),
-          UtcDrawingDate: moment(unsafeCondition.UtcDrawingDate).add(5, 'hours')
+          UtcDrawingDate: moment(unsafeCondition.UtcDrawingDate).add(
+            5,
+            "hours"
+          ),
+          CreatedByForUser: undefined,
         },
         { headers: { Authorization: "Bearer " + token } }
       )
@@ -154,7 +158,7 @@ router.post("/", async (req, res) => {
             dataAreaId: _unsafeCondition.dataAreaId,
             SRF_HSEIdUnsafeCondition: _unsafeCondition.SRF_HSEIdUnsafeCondition,
             ...eventDetails,
-            EventDate2: moment(eventDetails.EventDate2).add(5, 'hours')
+            EventDate2: moment(eventDetails.EventDate2).add(5, "hours"),
           },
           {
             headers: { Authorization: "Bearer " + token },
@@ -191,7 +195,7 @@ router.post("/", async (req, res) => {
               SRF_HSEIdUnsafeCondition: _eventDetails.SRF_HSEIdUnsafeCondition,
               RefRecid: _eventDetails.RecId1,
               ...cause,
-              Description:undefined
+              Description: undefined,
             },
             {
               headers: { Authorization: "Bearer " + token },

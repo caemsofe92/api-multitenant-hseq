@@ -2,6 +2,7 @@ let express = require("express");
 let router = express.Router();
 const axios = require("axios");
 const client = require("../bin/redis-client");
+const moment = require("moment");
 
 router.post("/", async (req, res) => {
   try {
@@ -159,7 +160,10 @@ router.post("/", async (req, res) => {
       _eventDetails = await axios
         .patch(
           `${tenant}/data/SRF_HSEEventDetails(RecId1=${eventDetails.RecId1},dataAreaId='${eventDetails.dataAreaId}',SRF_HSEIdUnsafeCondition='${eventDetails.SRF_HSEIdUnsafeCondition}')?cross-company=true`,
-          eventDetails,
+          {
+            ...eventDetails,
+            EventDate2: moment(eventDetails.EventDate2).add(5, "hours"),
+          },
           {
             headers: { Authorization: "Bearer " + token, "If-Match": "*" },
           }
