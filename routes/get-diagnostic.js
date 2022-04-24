@@ -123,9 +123,12 @@ router.post("/", async (req, res) => {
       .all([Entity1, Entity2, Entity3, Entity4, Entity5])
       .then(
         axios.spread(async (...responses) => {
+          let SRF_HSEDiagnosticIds = responses[1].data.value.map(item => item.RecId1);
           const SRF_HSEDiagnosticLine = responses[2].data;
           const SRF_HSEApprovalLineEntity = responses[0].data;
-          const SRF_HSEDiagnosticLine2 = SRF_HSEDiagnosticLine.value.map(
+          let SRF_HSEDiagnosticLineIds = [];
+          let SRF_HSEDiagnosticLine2 = SRF_HSEDiagnosticLine.value.filter(item => SRF_HSEDiagnosticIds.includes(item.RefRecId))
+          SRF_HSEDiagnosticLine2 = SRF_HSEDiagnosticLine2.map(
             (item) => {
               const approvalList = SRF_HSEApprovalLineEntity.value
                 .filter(
@@ -134,6 +137,7 @@ router.post("/", async (req, res) => {
                     approvalElement.dataAreaId === item.dataAreaId
                 )
                 .map((approvalElement) => approvalElement.Score);
+                SRF_HSEDiagnosticLineIds.push(item.RecId1);
               return {
                 ...item,
                 MaxScore: Math.max(...approvalList),
@@ -142,12 +146,13 @@ router.post("/", async (req, res) => {
             }
           );
 
+          const SRF_HSEImprovementOpportunities = responses[4].data.value.filter(item => item.Origin === "Diagnostic" && SRF_HSEDiagnosticLineIds.includes(item.RefRecId));
+
           const reply = {
             SRF_HSEApprovalLineEntity: SRF_HSEApprovalLineEntity.value,
             SRF_HSEDiagnosticEntity: responses[1].data.value,
-            SRF_HSEDiagnosticLine: SRF_HSEDiagnosticLine.value,
             SRF_HSEComplianceEvidencesEntity: responses[3].data.value,
-            SRF_HSEImprovementOpportunities: responses[4].data.value,
+            SRF_HSEImprovementOpportunities,
             SRF_HSEDiagnosticLine2,
           };
 

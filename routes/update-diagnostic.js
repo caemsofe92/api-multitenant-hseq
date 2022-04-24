@@ -179,32 +179,31 @@ router.post("/", async (req, res) => {
               throw new Error("Error", error.message);
             }
           });
-        _improvementOpportunities.push(
-          {
-            "dataAreaId": diagnostic.dataAreaId,
-            "SRF_HSEIdImprovementOpportunities": opportunityResponse.data,
-            "IdAction": "",
-            "IdProcess": "",
-            "Description": opportunity._description,
-            "RefRecIdRegulations": 0,
-            "SRF_HSETableID": 0,
-            "Responsible": "",
-            "IdManagementActions": "",
-            "NonQualityCost": 0,
-            "Origin": "Diagnostic",
-            "RoleId": "",
-            "Norm": "",
-            "HcmEmploymentType": "Employee",
-            "RefRecId": opportunity._refRecId,
-            "DetectionDate": diagnostic.ExecutionDate,
-            "ResponsibleLastName": "",
-            "Reach": "NotValue",
-            "IdSistem": "",
-            "IdOrigin": diagnostic.SRF_HSEIdDiagnostic,
-            "RefTableId": 17070,
-            "State": "Open",
-            "ResponsibleName": ""
-          });
+        _improvementOpportunities.push({
+          dataAreaId: diagnostic.dataAreaId,
+          SRF_HSEIdImprovementOpportunities: opportunityResponse.data,
+          IdAction: "",
+          IdProcess: "",
+          Description: opportunity._description,
+          RefRecIdRegulations: 0,
+          SRF_HSETableID: 0,
+          Responsible: "",
+          IdManagementActions: "",
+          NonQualityCost: 0,
+          Origin: "Diagnostic",
+          RoleId: "",
+          Norm: "",
+          HcmEmploymentType: "Employee",
+          RefRecId: opportunity._refRecId,
+          DetectionDate: diagnostic.ExecutionDate,
+          ResponsibleLastName: "",
+          Reach: "NotValue",
+          IdSistem: "",
+          IdOrigin: diagnostic.SRF_HSEIdDiagnostic,
+          RefTableId: 17070,
+          State: "Open",
+          ResponsibleName: "",
+        });
       }
     }
 
