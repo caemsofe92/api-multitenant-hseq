@@ -123,6 +123,8 @@ router.post("/", async (req, res) => {
       .all([Entity1, Entity2, Entity3, Entity4, Entity5])
       .then(
         axios.spread(async (...responses) => {
+          const SRF_HSEDiagnosticEntity = responses[1].data.value.filter(item => item.State === "Execute" || item.State === "InProcess");
+
           let SRF_HSEDiagnosticIds = responses[1].data.value.map(item => item.RecId1);
           const SRF_HSEDiagnosticLine = responses[2].data;
           const SRF_HSEApprovalLineEntity = responses[0].data;
@@ -150,7 +152,7 @@ router.post("/", async (req, res) => {
 
           const reply = {
             SRF_HSEApprovalLineEntity: SRF_HSEApprovalLineEntity.value,
-            SRF_HSEDiagnosticEntity: responses[1].data.value,
+            SRF_HSEDiagnosticEntity,
             SRF_HSEComplianceEvidencesEntity: responses[3].data.value,
             SRF_HSEImprovementOpportunities,
             SRF_HSEDiagnosticLine2,
