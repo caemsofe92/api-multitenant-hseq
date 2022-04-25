@@ -4,6 +4,13 @@ const axios = require("axios");
 const client = require("../bin/redis-client");
 const moment = require("moment");
 
+const { BlobServiceClient } = require("@azure/storage-blob");
+const blobServiceClient = BlobServiceClient.fromConnectionString(
+  "DefaultEndpointsProtocol=https;AccountName=multitenantappsstorage;AccountKey=dUEqKBrzMOB0qzOSZMADxP4ywLWJnmTh4s2ar5hh3yhkKmlgaQUlsIDmdB89EMG00fCu2lIIYFiJYfpjZ3duJQ==;EndpointSuffix=core.windows.net"
+);
+const { v1: uuidv1} = require('uuid');
+require('dotenv').config()
+
 router.post("/", async (req, res) => {
   try {
     const tenantUrl = req.query.tenantUrl || (req.body && req.body.tenantUrl);
@@ -82,12 +89,12 @@ router.post("/", async (req, res) => {
         `${tenant}/data/SRF_HSEUnsafeConditionsReport?$format=application/json;odata.metadata=none`,
         {
           ...unsafeCondition,
+          CreatedByForUser: undefined,
           Responsible: unsafeCondition.Responsible.toString(),
           UtcDrawingDate: moment(unsafeCondition.UtcDrawingDate).add(
             5,
             "hours"
-          ),
-          CreatedByForUser: undefined,
+          )
         },
         { headers: { Authorization: "Bearer " + token } }
       )
@@ -254,6 +261,25 @@ router.post("/", async (req, res) => {
             }
           });
         _potentialEventDamage.push(damageResponse.data);
+      }
+    }
+
+    if (evidences) {
+      for (let i = 0; i < evidences.length; i++) {
+        const element = evidences[i];
+
+        const containerClient = await blobServiceClient.getContainerClient(
+          "raic-evidences"
+        );
+        const blockBlobClient = containerClient.getBlockBlobClient(
+          uuidv1()+element.imageName
+        );
+        const matches = element.imagePath.match(
+          /^data:([A-Za-z-+\/]+);base64,(.+)$/
+        );
+        const buffer = new Buffer.from(matches[2], "base64");
+
+        await blockBlobClient.upload(buffer, buffer.byteLength);
       }
     }
 

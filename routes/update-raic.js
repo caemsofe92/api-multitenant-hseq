@@ -5,7 +5,7 @@ const client = require("../bin/redis-client");
 const moment = require("moment");
 
 router.post("/", async (req, res) => {
-  try {
+  
     const tenantUrl = req.query.tenantUrl || (req.body && req.body.tenantUrl);
     const clientId = req.query.clientId || (req.body && req.body.clientId);
     const clientSecret =
@@ -210,6 +210,7 @@ router.post("/", async (req, res) => {
             ) {
               throw new Error(error.response.data.error.innererror.message);
             } else if (error.request) {
+              console.error(error.request);
               throw new Error(error.request);
             } else {
               throw new Error("Error", error.message);
@@ -345,6 +346,7 @@ router.post("/", async (req, res) => {
       _potentialEventDamage,
       _evidences: [],
     });
+    try {
   } catch (error) {
     return res.status(500).json({
       result: false,
