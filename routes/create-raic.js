@@ -83,6 +83,7 @@ router.post("/", async (req, res) => {
         EX: 3599,
       });
     }
+
     const newRequest = {
       dataAreaId: unsafeCondition.dataAreaId,
       ReportType: unsafeCondition.ReportType,
@@ -96,6 +97,8 @@ router.post("/", async (req, res) => {
       ),
       State: unsafeCondition.State
     };
+
+    return res.json(newRequest);
     
     let _unsafeCondition = await axios
       .post(
@@ -270,12 +273,13 @@ router.post("/", async (req, res) => {
     }
 
     if (evidences) {
+      const containerClient = await blobServiceClient.getContainerClient(
+        "raic-evidences"
+      );
+
       for (let i = 0; i < evidences.length; i++) {
         const element = evidences[i];
 
-        const containerClient = await blobServiceClient.getContainerClient(
-          "raic-evidences"
-        );
         const blockBlobClient = containerClient.getBlockBlobClient(
           uuidv1()+element.imageName
         );
