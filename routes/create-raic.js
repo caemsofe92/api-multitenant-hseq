@@ -97,8 +97,6 @@ router.post("/", async (req, res) => {
       ),
       State: unsafeCondition.State
     };
-
-    return res.json(newRequest);
     
     let _unsafeCondition = await axios
       .post(
