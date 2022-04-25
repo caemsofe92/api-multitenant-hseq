@@ -83,20 +83,24 @@ router.post("/", async (req, res) => {
         EX: 3599,
       });
     }
-    const newrequest = {
-      ...unsafeCondition,
-      CreatedByForUser: null,
+    const newRequest = {
+      dataAreaId: unsafeCondition.dataAreaId,
+      ReportType: unsafeCondition.ReportType,
+      Other: unsafeCondition.Other,
       Responsible: unsafeCondition.Responsible.toString(),
+      Description: unsafeCondition.Description,
+      //CreatedByForUser: unsafeCondition.CreatedByForUser,
       UtcDrawingDate: moment(unsafeCondition.UtcDrawingDate).add(
         5,
         "hours"
-      )
+      ),
+      State: unsafeCondition.State
     };
-    console.error(newrequest);
+    
     let _unsafeCondition = await axios
       .post(
         `${tenant}/data/SRF_HSEUnsafeConditionsReport?$format=application/json;odata.metadata=none`,
-        newrequest,
+        newRequest,
         { headers: { Authorization: "Bearer " + token } }
       )
       .catch(function (error) {
