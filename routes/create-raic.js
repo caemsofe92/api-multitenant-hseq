@@ -85,7 +85,7 @@ router.post("/", async (req, res) => {
     }
     const newrequest = {
       ...unsafeCondition,
-      CreatedByForUser: undefined,
+      CreatedByForUser: null,
       Responsible: unsafeCondition.Responsible.toString(),
       UtcDrawingDate: moment(unsafeCondition.UtcDrawingDate).add(
         5,
