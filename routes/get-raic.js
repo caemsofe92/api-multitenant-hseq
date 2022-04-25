@@ -237,7 +237,11 @@ router.post("/", async (req, res) => {
             SRF_HSEObjectDamage: responses[5].data.value,
             SRF_HSEPropertyType: responses[6].data.value,
             SRF_HSEHarmLevelsEntity: responses[7].data.value,
-            SRF_HSEUnsafeConditionsReport: responses[8].data.value,
+            SRF_HSEUnsafeConditionsReport: responses[8].data.value.map(
+              (item) => {
+                return { ...item, CreatedByForUser: undefined };
+              }
+            ),
             SRF_HSEEventDetails: responses[9].data.value,
             SRF_HSEEventCauses: responses[10].data.value,
             SRF_HSEPotentialEventDamage: responses[11].data.value,
