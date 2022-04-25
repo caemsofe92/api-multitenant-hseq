@@ -271,12 +271,13 @@ router.post("/", async (req, res) => {
     }
 
     if (evidences) {
-      const containerClient = await blobServiceClient.getContainerClient(
-        "raic-evidences"
-      );
-
+      
       for (let i = 0; i < evidences.length; i++) {
         const element = evidences[i];
+
+        const containerClient = await blobServiceClient.getContainerClient(
+          "raic-evidences"
+        );
 
         const blockBlobClient = containerClient.getBlockBlobClient(
           uuidv1()+element.imageName
