@@ -294,6 +294,17 @@ router.post("/", async (req, res) => {
       }
     }
 
+    console.error({
+      result: true,
+      message: "OK",
+      _unsafeCondition,
+      _improvementOpportunity,
+      _eventDetails,
+      _eventCauses,
+      _potentialEventDamage,
+      _evidences: evidences,
+    });
+
     return res.json({
       result: true,
       message: "OK",
