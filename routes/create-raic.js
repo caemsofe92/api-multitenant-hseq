@@ -9,7 +9,7 @@ const blobServiceClient = BlobServiceClient.fromConnectionString(
   "DefaultEndpointsProtocol=https;AccountName=multitenantappsstorage;AccountKey=dUEqKBrzMOB0qzOSZMADxP4ywLWJnmTh4s2ar5hh3yhkKmlgaQUlsIDmdB89EMG00fCu2lIIYFiJYfpjZ3duJQ==;EndpointSuffix=core.windows.net"
 );
 const { v1: uuidv1} = require('uuid');
-require('dotenv').config()
+
 
 router.post("/", async (req, res) => {
   try {
@@ -299,7 +299,7 @@ router.post("/", async (req, res) => {
       _eventDetails,
       _eventCauses,
       _potentialEventDamage,
-      _evidences: [],
+      _evidences: evidences,
     });
   } catch (error) {
     return res.status(500).json({
