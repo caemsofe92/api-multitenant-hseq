@@ -282,10 +282,11 @@ router.post("/", async (req, res) => {
         const blockBlobClient = containerClient.getBlockBlobClient(
           uuidv1()+element.imageName
         );
-        const matches = element.imagePath.match(
+        const path = JSON.parse(element.imagePath);
+        const matches = path.match(
           /^data:([A-Za-z-+\/]+);base64,(.+)$/
         );
-        if(matches[2]){
+        if(matches.length > 0 && matches[2] !== "" && matches[2]){
         const buffer = new Buffer(matches[2], "base64");
 
         await blockBlobClient.upload(buffer, buffer.byteLength);
