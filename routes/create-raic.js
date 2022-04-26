@@ -8,8 +8,7 @@ const { BlobServiceClient } = require("@azure/storage-blob");
 const blobServiceClient = BlobServiceClient.fromConnectionString(
   "DefaultEndpointsProtocol=https;AccountName=multitenantappsstorage;AccountKey=dUEqKBrzMOB0qzOSZMADxP4ywLWJnmTh4s2ar5hh3yhkKmlgaQUlsIDmdB89EMG00fCu2lIIYFiJYfpjZ3duJQ==;EndpointSuffix=core.windows.net"
 );
-const { v1: uuidv1} = require('uuid');
-
+const { v1: uuidv1 } = require("uuid");
 
 router.post("/", async (req, res) => {
   try {
@@ -91,13 +90,10 @@ router.post("/", async (req, res) => {
       Responsible: unsafeCondition.Responsible.toString(),
       Description: unsafeCondition.Description,
       //CreatedByForUser: unsafeCondition.CreatedByForUser,
-      UtcDrawingDate: moment(unsafeCondition.UtcDrawingDate).add(
-        5,
-        "hours"
-      ),
-      State: unsafeCondition.State
+      UtcDrawingDate: moment(unsafeCondition.UtcDrawingDate).add(5, "hours"),
+      State: unsafeCondition.State,
     };
-    
+
     let _unsafeCondition = await axios
       .post(
         `${tenant}/data/SRF_HSEUnsafeConditionsReport?$format=application/json;odata.metadata=none`,
@@ -271,7 +267,6 @@ router.post("/", async (req, res) => {
     }
 
     if (evidences) {
-      
       for (let i = 0; i < evidences.length; i++) {
         const element = evidences[i];
 
@@ -279,19 +274,61 @@ router.post("/", async (req, res) => {
           "raic-evidences"
         );
 
-        const blockBlobClient = containerClient.getBlockBlobClient(
-          uuidv1()+element.imageName
-        );
-        const path = (JSON.parse(element.imagePath)).toString();
+        const path = JSON.parse(element.imagePath).toString();
         
-        const matches = path.match(
-          /^data:([A-Za-z-+\/]+);base64,(.+)$/
-        );
+        const matches = path.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
         
         const buffer = new Buffer.from(matches[2], "base64");
+        
+        const imageType = matches[1];
+        
+        const name = _unsafeCondition.RecId1 + uuidv1()+ "." + imageType.split('/')[1];
+        
+        const blockBlobClient = containerClient.getBlockBlobClient(name);
 
-        await blockBlobClient.upload(buffer, buffer.byteLength);
-      
+        const responseImage = await blockBlobClient.upload(
+          buffer,
+          buffer.byteLength
+        );
+
+        let _responseImage;
+
+        if (responseImage) {
+          
+          const imageRequest = {
+            _DataareaId: _unsafeCondition.dataAreaId,
+            _AccesInformation: `https://multitenantappsstorage.blob.core.windows.net/raic-evidences/${name}`,
+            _name: name,
+            _TableId: 20371,
+            _RefRecId: _unsafeCondition.RecId1,
+            _FileType: imageType.split('/')[1],
+          };
+          
+          _responseImage = await axios
+            .post(
+              `${tenant}/api/services/SRF_HSEDocuRefServicesGroup/SRF_HSEDocuRefServices/FillDocuRef`,
+              imageRequest,
+              {
+                headers: { Authorization: "Bearer " + token },
+              }
+            )
+            .catch(function (error) {
+              if (
+                error.response &&
+                error.response.data &&
+                error.response.data.error &&
+                error.response.data.error.innererror &&
+                error.response.data.error.innererror.message
+              ) {
+                throw new Error(error.response.data.error.innererror.message);
+              } else if (error.request) {
+                throw new Error(error.request);
+              } else {
+                throw new Error("Error", error.message);
+              }
+            });
+          _responseImage = _responseImage.data;
+        }
       }
     }
 
@@ -303,7 +340,7 @@ router.post("/", async (req, res) => {
       _eventDetails,
       _eventCauses,
       _potentialEventDamage,
-      _evidences: evidences
+      _evidences: evidences,
     });
   } catch (error) {
     return res.status(500).json({
