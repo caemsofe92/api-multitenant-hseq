@@ -5,7 +5,7 @@ const client = require("../bin/redis-client");
 const moment = require("moment");
 
 router.post("/", async (req, res) => {
-  
+  try {
     const tenantUrl = req.query.tenantUrl || (req.body && req.body.tenantUrl);
     const clientId = req.query.clientId || (req.body && req.body.clientId);
     const clientSecret =
@@ -344,9 +344,9 @@ router.post("/", async (req, res) => {
       _eventCauses,
       _deletePotentialEventDamage,
       _potentialEventDamage,
-      _evidences: [],
+      _evidences: evidences,
     });
-    try {
+   
   } catch (error) {
     return res.status(500).json({
       result: false,
