@@ -266,13 +266,13 @@ router.post("/", async (req, res) => {
       const blobServiceClient = BlobServiceClient.fromConnectionString(
         "DefaultEndpointsProtocol=https;AccountName=multitenantappsstorage;AccountKey=dUEqKBrzMOB0qzOSZMADxP4ywLWJnmTh4s2ar5hh3yhkKmlgaQUlsIDmdB89EMG00fCu2lIIYFiJYfpjZ3duJQ==;EndpointSuffix=core.windows.net"
       );
-      
+
+      const containerClient = await blobServiceClient.getContainerClient(
+        "raic-evidences"
+      );
+
       for (let i = 0; i < evidences.length; i++) {
         const element = evidences[i];
-
-        const containerClient = await blobServiceClient.getContainerClient(
-          "raic-evidences"
-        );
 
         const path = JSON.parse(element.imagePath).toString();
         
