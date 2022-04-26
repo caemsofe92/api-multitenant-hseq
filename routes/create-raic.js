@@ -285,7 +285,7 @@ router.post("/", async (req, res) => {
         const matches = element.imagePath.match(
           /^data:([A-Za-z-+\/]+);base64,(.+)$/
         );
-        const buffer = new Buffer.from(matches[2], "base64");
+        const buffer = new Buffer(matches[2], "base64");
 
         await blockBlobClient.upload(buffer, buffer.byteLength);
       }
