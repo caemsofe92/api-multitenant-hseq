@@ -3,11 +3,7 @@ let router = express.Router();
 const axios = require("axios");
 const client = require("../bin/redis-client");
 const moment = require("moment");
-
 const { BlobServiceClient } = require("@azure/storage-blob");
-const blobServiceClient = BlobServiceClient.fromConnectionString(
-  "DefaultEndpointsProtocol=https;AccountName=multitenantappsstorage;AccountKey=dUEqKBrzMOB0qzOSZMADxP4ywLWJnmTh4s2ar5hh3yhkKmlgaQUlsIDmdB89EMG00fCu2lIIYFiJYfpjZ3duJQ==;EndpointSuffix=core.windows.net"
-);
 const { v1: uuidv1 } = require("uuid");
 
 router.post("/", async (req, res) => {
@@ -267,6 +263,10 @@ router.post("/", async (req, res) => {
     }
 
     if (evidences) {
+      const blobServiceClient = BlobServiceClient.fromConnectionString(
+        "DefaultEndpointsProtocol=https;AccountName=multitenantappsstorage;AccountKey=dUEqKBrzMOB0qzOSZMADxP4ywLWJnmTh4s2ar5hh3yhkKmlgaQUlsIDmdB89EMG00fCu2lIIYFiJYfpjZ3duJQ==;EndpointSuffix=core.windows.net"
+      );
+      
       for (let i = 0; i < evidences.length; i++) {
         const element = evidences[i];
 
@@ -294,7 +294,7 @@ router.post("/", async (req, res) => {
         let _responseImage;
 
         if (responseImage) {
-          
+
           const imageRequest = {
             _DataareaId: _unsafeCondition.dataAreaId,
             _AccesInformation: `https://multitenantappsstorage.blob.core.windows.net/raic-evidences/${name}`,
