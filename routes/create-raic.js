@@ -282,7 +282,7 @@ router.post("/", async (req, res) => {
         const blockBlobClient = containerClient.getBlockBlobClient(
           uuidv1()+element.imageName
         );
-        const path = JSON.parse(element.imagePath);
+        const path = (JSON.parse(element.imagePath)).toString();
         
         const matches = path.match(
           /^data:([A-Za-z-+\/]+);base64,(.+)$/
@@ -295,17 +295,6 @@ router.post("/", async (req, res) => {
       }
     }
 
-    console.error({
-      result: true,
-      message: "OK",
-      _unsafeCondition,
-      _improvementOpportunity,
-      _eventDetails,
-      _eventCauses,
-      _potentialEventDamage,
-      _evidences: evidences,
-    });
-
     return res.json({
       result: true,
       message: "OK",
@@ -314,7 +303,7 @@ router.post("/", async (req, res) => {
       _eventDetails,
       _eventCauses,
       _potentialEventDamage,
-      _evidences: evidences,
+      _evidences: evidences
     });
   } catch (error) {
     return res.status(500).json({
