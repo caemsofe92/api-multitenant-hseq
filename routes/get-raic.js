@@ -40,8 +40,6 @@ router.post("/", async (req, res) => {
 
     if (!client.isOpen) client.connect();
 
-    console.error("Prueba entro al get raic");
-
     if (!refresh) {
       const mainReply = await client.get(entity + userCompany);
       if (mainReply)
