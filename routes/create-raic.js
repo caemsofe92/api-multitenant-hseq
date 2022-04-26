@@ -283,6 +283,7 @@ router.post("/", async (req, res) => {
         const imageType = matches[1];
         
         const name = _unsafeCondition.RecId1 + uuidv1()+ "." + imageType.split('/')[1];
+        console.error(name);
         
         const blockBlobClient = containerClient.getBlockBlobClient(name);
 
@@ -290,19 +291,23 @@ router.post("/", async (req, res) => {
           buffer,
           buffer.byteLength
         );
+        console.error(responseImage);
+
+        const imageRequest = {
+          _DataareaId: _unsafeCondition.dataAreaId,
+          _AccesInformation: `https://multitenantappsstorage.blob.core.windows.net/raic-evidences/${name}`,
+          _name: name,
+          _TableId: 20371,
+          _RefRecId: _unsafeCondition.RecId1,
+          _FileType: imageType.split('/')[1],
+        };
+        console.error(imageRequest);
+
+        
 
         let _responseImage;
 
         if (responseImage) {
-
-          const imageRequest = {
-            _DataareaId: _unsafeCondition.dataAreaId,
-            _AccesInformation: `https://multitenantappsstorage.blob.core.windows.net/raic-evidences/${name}`,
-            _name: name,
-            _TableId: 20371,
-            _RefRecId: _unsafeCondition.RecId1,
-            _FileType: imageType.split('/')[1],
-          };
           
           _responseImage = await axios
             .post(
