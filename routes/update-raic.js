@@ -425,9 +425,10 @@ router.post("/", async (req, res) => {
                 }
               });
 
-            _evidences.push(
-              `https://multitenantappsstorage.blob.core.windows.net/raic-evidences/${name}`
-            );
+            _evidences.push({
+              RefRecId: unsafeCondition.RecId1,
+              OriginalFileName: name,
+            });
           }
         }
       }

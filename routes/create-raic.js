@@ -181,7 +181,8 @@ router.post("/", async (req, res) => {
           }
         });
 
-        _unsafeCondition.SRF_HSEIdImprovementOpportunities = _improvementOpportunity.SRF_HSEIdImprovementOpportunities;
+      _unsafeCondition.SRF_HSEIdImprovementOpportunities =
+        _improvementOpportunity.SRF_HSEIdImprovementOpportunities;
     }
 
     let _eventDetails;
@@ -319,7 +320,7 @@ router.post("/", async (req, res) => {
 
           const name =
             _unsafeCondition.RecId1 +
-            (moment().format()).toString() +
+            moment().format().toString() +
             "hseqraicimage." +
             imageType.split("/")[1];
 
@@ -365,9 +366,10 @@ router.post("/", async (req, res) => {
                   throw new Error("Error", error.message);
                 }
               });
-            _evidences.push(
-              `https://multitenantappsstorage.blob.core.windows.net/raic-evidences/${name}`
-            );
+            _evidences.push({
+              RefRecId: _unsafeCondition.RecId1,
+              OriginalFileName: name,
+            });
           }
         }
       }
