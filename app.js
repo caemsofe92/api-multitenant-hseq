@@ -9,13 +9,15 @@ var updateRAICRouter = require("./routes/update-raic");
 var updateDiagnosticRouter = require("./routes/update-diagnostic");
 var getHome = require("./routes/get-home");
 var getRaic = require("./routes/get-raic");
+var getFilterRaic = require("./routes/get-filter-raic");
 var getDiagnostic = require("./routes/get-diagnostic");
+var getWorkers = require("./routes/get-workers");
 
 var app = express();
 app.use(compression());
 app.use(cookieParser());
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ limit: '50mb', extended: true }));
+app.use(express.json({ limit: '100mb' }));
+app.use(express.urlencoded({ limit: '100mb', extended: true }));
 
 app.use("/", indexRouter);
 app.use("/create-raic", createRAICRouter);
@@ -24,6 +26,8 @@ app.use("/update-diagnostic", updateDiagnosticRouter);
 app.use("/get-home", getHome);
 app.use("/get-raic", getRaic);
 app.use("/get-diagnostic", getDiagnostic);
+app.use("/get-filter-raic", getFilterRaic);
+app.use("/get-workers", getWorkers);
 
 app.use(function (req, res, next) {
   next(createError(404));

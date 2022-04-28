@@ -11,13 +11,17 @@ router.post("/", async (req, res) => {
       req.query.clientSecret || (req.body && req.body.clientSecret);
     const tenant = req.query.tenant || (req.body && req.body.tenant);
     const entity = req.query.entity || (req.body && req.body.entity);
+    const offset = req.query.offset || (req.body && req.body.offset);
     const numberOfElements =
       req.query.numberOfElements || (req.body && req.body.numberOfElements);
+    const isTest = req.query.isTest || (req.body && req.body.isTest);
     const refresh = req.query.refresh || (req.body && req.body.refresh);
     const userCompany =
       req.query.userCompany || (req.body && req.body.userCompany);
     const environment =
       req.query.environment || (req.body && req.body.environment);
+    const search = req.query.search || (req.body && req.body.search);
+    const sort = req.query.sort || (req.body && req.body.sort);
 
     if (!tenantUrl || tenantUrl.length === 0)
       throw new Error("tenantUrl is Mandatory");
@@ -89,14 +93,19 @@ router.post("/", async (req, res) => {
     const Entity2 = axios.get(
       `${tenant}/data/SRF_HSEDiagnosticEntity?$format=application/json;odata.metadata=none${
         numberOfElements ? "&$top=" + numberOfElements : ""
-      }&cross-company=true${
-        userCompany ? `&$filter=dataAreaId eq '${userCompany}'` : ""
-      }&$orderby=DrawingDate desc`,
+      }${
+        offset ? "&$skip=" + offset : ""
+      }&$count=true&cross-company=true&$filter=(State eq Microsoft.Dynamics.DataEntities.SRF_HSEDiagnosticState'Execute' or State eq Microsoft.Dynamics.DataEntities.SRF_HSEDiagnosticState'InProcess')${
+        userCompany ? ` and dataAreaId eq '${userCompany}'` : ""
+      }${
+        search ? ` and SRF_HSEIdDiagnostic eq '*${search}*'` : ""
+      }&$orderby=SRF_HSEIdDiagnostic ${sort ? sort : "desc"}`,
       { headers: { Authorization: "Bearer " + token } }
     );
+
     const Entity3 = axios.get(
       `${tenant}/data/SRF_HSEDiagnosticLine?$format=application/json;odata.metadata=none${
-        numberOfElements ? "&$top=" + numberOfElements : ""
+        isTest && numberOfElements ? "&$top=" + numberOfElements : ""
       }&cross-company=true${
         userCompany ? `&$filter=dataAreaId eq '${userCompany}'` : ""
       }`,
@@ -104,7 +113,7 @@ router.post("/", async (req, res) => {
     );
     const Entity4 = axios.get(
       `${tenant}/data/SRF_HSEComplianceEvidencesEntity?$format=application/json;odata.metadata=none${
-        numberOfElements ? "&$top=" + numberOfElements : ""
+        isTest && numberOfElements ? "&$top=" + numberOfElements : ""
       }&cross-company=true${
         userCompany ? `&$filter=dataAreaId eq '${userCompany}'` : ""
       }`,
@@ -112,54 +121,72 @@ router.post("/", async (req, res) => {
     );
     const Entity5 = axios.get(
       `${tenant}/data/SRF_HSEImprovementOpportunities?$format=application/json;odata.metadata=none${
-        numberOfElements ? "&$top=" + numberOfElements : ""
-      }&cross-company=true${
-        userCompany ? `&$filter=dataAreaId eq '${userCompany}'` : ""
-      }`,
+        isTest && numberOfElements ? "&$top=" + numberOfElements : ""
+      }&cross-company=true&$select=Description,SRF_HSEIdImprovementOpportunities,RefRecId&$filter=${
+        userCompany ? `dataAreaId eq '${userCompany}' and ` : ""
+      }RefTableId eq 17070`,
+      { headers: { Authorization: "Bearer " + token } }
+    );
+
+    const Entity6 = axios.get(
+      `${tenant}/data/SRF_DocuRef?$format=application/json;odata.metadata=none${
+        isTest && numberOfElements ? "&$top=" + numberOfElements : ""
+      }&cross-company=true&$select=OriginalFileName,RefRecId&$filter=${
+        userCompany ? `RefCompanyId eq '${userCompany}' and ` : ""
+      }RefTableId eq 17070 and TypeId eq 'File' and OriginalFileName eq '*hseqdiagnosticimage*'`,
       { headers: { Authorization: "Bearer " + token } }
     );
 
     await axios
-      .all([Entity1, Entity2, Entity3, Entity4, Entity5])
+      .all([Entity1, Entity2, Entity3, Entity4, Entity5, Entity6])
       .then(
         axios.spread(async (...responses) => {
-          const SRF_HSEDiagnosticEntity = responses[1].data.value.filter(item => item.State === "Execute" || item.State === "InProcess");
+          const SRF_HSEDiagnosticEntity = responses[1].data.value;
 
-          let SRF_HSEDiagnosticIds = responses[1].data.value.map(item => item.RecId1);
-          const SRF_HSEDiagnosticLine = responses[2].data;
-          const SRF_HSEApprovalLineEntity = responses[0].data;
+          let SRF_HSEDiagnosticIds = responses[1].data.value.map(
+            (item) => item.RecId1
+          );
+          const _SRF_HSEDiagnosticLine = responses[2].data;
+          const SRF_HSEApprovalLineEntity = responses[0].data.value;
           let SRF_HSEDiagnosticLineIds = [];
-          let SRF_HSEDiagnosticLine2 = SRF_HSEDiagnosticLine.value.filter(item => SRF_HSEDiagnosticIds.includes(item.RefRecId))
-          SRF_HSEDiagnosticLine2 = SRF_HSEDiagnosticLine2.map(
-            (item) => {
-              const approvalList = SRF_HSEApprovalLineEntity.value
-                .filter(
-                  (approvalElement) =>
-                    approvalElement.IdApproval === item.IdApproval &&
-                    approvalElement.dataAreaId === item.dataAreaId
-                )
-                .map((approvalElement) => approvalElement.Score);
-                SRF_HSEDiagnosticLineIds.push(item.RecId1);
-              return {
-                ...item,
-                MaxScore: Math.max(...approvalList),
-                MinScore: Math.min(...approvalList),
-              };
-            }
+          let SRF_HSEDiagnosticLine = _SRF_HSEDiagnosticLine.value.filter(
+            (item) => SRF_HSEDiagnosticIds.includes(item.RefRecId)
+          );
+          SRF_HSEDiagnosticLine = SRF_HSEDiagnosticLine.map((item) => {
+            const approvalList = SRF_HSEApprovalLineEntity.filter(
+              (approvalElement) =>
+                approvalElement.IdApproval === item.IdApproval &&
+                approvalElement.dataAreaId === item.dataAreaId
+            ).map((approvalElement) => approvalElement.Score);
+            SRF_HSEDiagnosticLineIds.push(item.RecId1);
+            return {
+              ...item,
+              MaxScore: Math.max(...approvalList),
+              MinScore: Math.min(...approvalList),
+            };
+          });
+
+          const SRF_HSEImprovementOpportunitiesDiagnostic =
+            responses[4].data.value.filter((item) =>
+              SRF_HSEDiagnosticLineIds.includes(item.RefRecId)
+            );
+
+          const SRF_DocuRefDiagnostic = responses[5].data.value.filter((item) =>
+            SRF_HSEDiagnosticLineIds.includes(item.RefRecId)
           );
 
-          const SRF_HSEImprovementOpportunities = responses[4].data.value.filter(item => item.Origin === "Diagnostic" && SRF_HSEDiagnosticLineIds.includes(item.RefRecId));
-
           const reply = {
-            SRF_HSEApprovalLineEntity: SRF_HSEApprovalLineEntity.value,
-            SRF_HSEDiagnosticEntity,
+            SRF_HSEApprovalLineEntity,
             SRF_HSEComplianceEvidencesEntity: responses[3].data.value,
-            SRF_HSEImprovementOpportunities,
-            SRF_HSEDiagnosticLine2,
+            SRF_HSEDiagnosticEntityCount: responses[1].data["@odata.count"],
+            SRF_HSEDiagnosticEntity,
+            SRF_HSEDiagnosticLine,
+            SRF_HSEImprovementOpportunitiesDiagnostic,
+            SRF_DocuRefDiagnostic,
           };
 
           await client.set(entity + userCompany, JSON.stringify(reply), {
-            EX: 9999999,
+            EX: 86400,
           });
           return res.json({ result: true, message: "OK", response: reply });
         })

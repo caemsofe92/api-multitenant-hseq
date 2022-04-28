@@ -97,7 +97,7 @@ router.post("/", async (req, res) => {
             mainReply = responses[0].data.value;
 
             await client.set(entity, JSON.stringify(mainReply), {
-              EX: 9999999,
+              EX: 86400,
             });
           })
         )
