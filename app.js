@@ -9,9 +9,9 @@ var updateRAICRouter = require("./routes/update-raic");
 var updateDiagnosticRouter = require("./routes/update-diagnostic");
 var getHome = require("./routes/get-home");
 var getRaic = require("./routes/get-raic");
-var getFilterRaic = require("./routes/get-filter-raic");
+var getFilterRaic = require("./routes/get-filtered-raic");
 var getDiagnostic = require("./routes/get-diagnostic");
-var getWorkers = require("./routes/get-workers");
+var getWorkers = require("./routes/get-workers-number");
 
 var app = express();
 app.use(compression());
@@ -26,8 +26,8 @@ app.use("/update-diagnostic", updateDiagnosticRouter);
 app.use("/get-home", getHome);
 app.use("/get-raic", getRaic);
 app.use("/get-diagnostic", getDiagnostic);
-app.use("/get-filter-raic", getFilterRaic);
-app.use("/get-workers", getWorkers);
+app.use("/get-filtered-raic", getFilterRaic);
+app.use("/get-workers-number", getWorkers);
 
 app.use(function (req, res, next) {
   next(createError(404));
