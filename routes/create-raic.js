@@ -84,6 +84,7 @@ router.post("/", async (req, res) => {
         `${tenant}/data/UnsafeConditionsReports?$format=application/json;odata.metadata=none`,
         {
           ...unsafeCondition,
+          TipoReporte: undefined,
           Responsible: unsafeCondition.Responsible.toString(),
           UtcDrawingDate: moment(unsafeCondition.UtcDrawingDate).add(
             5,
@@ -381,8 +382,8 @@ router.post("/", async (req, res) => {
           "https://prod-60.westus.logic.azure.com:443/workflows/ff6b14da6ee9444fb7f3c46b4558981b/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=Ba7NYh2lQRCXvSaz6xMQXKHGrQ1QWl48svmf6NS-c9c",
           {
             recipients: email.recipients,
-            message: email.message,
-            subject: email.subject,
+            message: `<div><p>Señores</p><p>Cordial saludo;</p><p>Nos permitimos notificarles que el ${moment(_unsafeCondition.UtcDrawingDate).format('Do MMMM YYYY a las h:mm:ss a')}, Ivan Orlando Medina Gomez ha generado el ${_unsafeCondition.SRF_HSEIdUnsafeCondition} de tipo “${unsafeCondition.TipoReporte}” en ${unsafeCondition.dataAreaId} para su respectiva gestión y cierre.</p><p>Gracias</p></div>`,
+            subject: `Reporte de actos, incidentes y condiciones inseguras creado - ${_unsafeCondition.SRF_HSEIdUnsafeCondition} ${unsafeCondition.dataAreaId}`,
           },
           {
             headers: { "Content-Type": "application/json" },
