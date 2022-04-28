@@ -80,7 +80,7 @@ router.post("/", async (req, res) => {
       });
     }
 
-    let _improvementOpportunity = {};
+    let _improvementOpportunity;
 
     if (
       unsafeCondition &&
@@ -127,7 +127,7 @@ router.post("/", async (req, res) => {
             Description: improvementOpportunity,
             RefRecId: unsafeCondition.RecId1,
           }
-        : {};
+        : null;
     }
 
     let _unsafeCondition;
@@ -140,6 +140,7 @@ router.post("/", async (req, res) => {
             ...unsafeCondition,
             RecId1: undefined,
             SRF_HSEIdImprovementOpportunities:
+              _improvementOpportunity &&
               _improvementOpportunity.SRF_HSEIdImprovementOpportunities &&
               unsafeCondition.SRF_HSEIdImprovementOpportunities.length === 0
                 ? _improvementOpportunity.SRF_HSEIdImprovementOpportunities
