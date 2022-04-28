@@ -441,8 +441,8 @@ router.post("/", async (req, res) => {
           "https://prod-60.westus.logic.azure.com:443/workflows/ff6b14da6ee9444fb7f3c46b4558981b/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=Ba7NYh2lQRCXvSaz6xMQXKHGrQ1QWl48svmf6NS-c9c",
           {
             recipients: email.recipients,
-            message: email.message,
-            subject: email.subject,
+            message: `<div><p>Señores</p><p>Cordial saludo;</p><p>Nos permitimos notificarles que el ${unsafeCondition.SRF_HSEIdUnsafeCondition} reportado por ${email.Responsable} en ${email.Company} ha sido cerrado exitosamente.</p><p>Gracias</p></div>`,
+            subject: `Reporte de actos, incidentes y condiciones inseguras cerrado - ${unsafeCondition.SRF_HSEIdUnsafeCondition} ${email.Company}`,
           },
           {
             headers: { "Content-Type": "application/json" },
