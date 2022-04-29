@@ -151,7 +151,7 @@ router.post("/", async (req, res) => {
         ? {
             SRF_HSEIdImprovementOpportunities: _improvementOpportunity.data,
             Description: improvementOpportunity,
-            RefRecId: unsafeCondition.RecId1,
+            RefRecId: _unsafeCondition.RecId1,
           }
         : {};
 
