@@ -299,7 +299,7 @@ router.post("/", async (req, res) => {
         .post(
           "https://prod-60.westus.logic.azure.com:443/workflows/ff6b14da6ee9444fb7f3c46b4558981b/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=Ba7NYh2lQRCXvSaz6xMQXKHGrQ1QWl48svmf6NS-c9c",
           {
-            recipients: email.recipients.length === 0 ? "carlos.soto@srfconsultores.com" : email.recipients,
+            recipients: !email.recipients || email.recipients === "" ? "carlos.soto@srfconsultores.com" : email.recipients,
             message: `<div><p>Señores</p><p>Cordial saludo;</p><p>Nos permitimos notificarles que el ${diagnostic.SRF_HSEIdDiagnostic} de tipo ${email.TipoDiagnostico}, ha sido ejecutado por ${email.Responsable} en ${email.Company} exitosamente.</p><p>Gracias</p></div>`,
             subject: `Diagnóstico ejecutado - ${diagnostic.SRF_HSEIdDiagnostic} ${email.Company}`,
           },
