@@ -78,7 +78,6 @@ router.post("/", async (req, res) => {
           `${tenant}/data/DiagnosticNews(RecIdGen=${diagnostic.RecIdGen},dataAreaId='${diagnostic.dataAreaId}')?cross-company=true`,
           {
             ...diagnostic,
-            RecIdGen: undefined,
             ExecutionDate: moment(diagnostic.ExecutionDate).add(5, "hours"),
           },
           {

@@ -138,7 +138,6 @@ router.post("/", async (req, res) => {
           `${tenant}/data/UnsafeConditionsReports(dataAreaId='${unsafeCondition.dataAreaId}',SRF_HSEIdUnsafeCondition='${unsafeCondition.SRF_HSEIdUnsafeCondition}')?cross-company=true`,
           {
             ...unsafeCondition,
-            RecId1: undefined,
             SRF_HSEIdImprovementOpportunities:
               _improvementOpportunity &&
               _improvementOpportunity.SRF_HSEIdImprovementOpportunities &&
@@ -181,7 +180,6 @@ router.post("/", async (req, res) => {
           `${tenant}/data/SRF_HSEEventDetails(RecId1=${eventDetails.RecId1},dataAreaId='${eventDetails.dataAreaId}',SRF_HSEIdUnsafeCondition='${eventDetails.SRF_HSEIdUnsafeCondition}')?cross-company=true`,
           {
             ...eventDetails,
-            RecId1:undefined,
             EventDate2: moment(eventDetails.EventDate2).add(5, "hours"),
           },
           {
