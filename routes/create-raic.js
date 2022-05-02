@@ -305,8 +305,6 @@ router.post("/", async (req, res) => {
       const containerClient =
         blobServiceClient.getContainerClient("raic-evidences");
 
-      console.error(blobServiceClient, containerClient);
-
       for (let i = 0; i < evidences.length; i++) {
         const element = evidences[i];
 
@@ -331,8 +329,6 @@ router.post("/", async (req, res) => {
             buffer,
             buffer.byteLength
           );
-
-          console.error(responseImage);
 
           const imageRequest = {
             _DataareaId: _unsafeCondition.dataAreaId,

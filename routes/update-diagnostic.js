@@ -78,6 +78,7 @@ router.post("/", async (req, res) => {
           `${tenant}/data/DiagnosticNews(RecIdGen=${diagnostic.RecIdGen},dataAreaId='${diagnostic.dataAreaId}')?cross-company=true`,
           {
             ...diagnostic,
+            RecIdGen: undefined,
             ExecutionDate: moment(diagnostic.ExecutionDate).add(5, "hours"),
           },
           {
@@ -174,6 +175,7 @@ router.post("/", async (req, res) => {
             `${tenant}/data/SRF_HSEDiagnosticLine(dataAreaId='${diagnostic.dataAreaId}',SRF_HSEIdDiagnostic='${diagnostic.SRF_HSEIdDiagnostic}',RecId1=${line.RecId1},Line=${line.Line})?cross-company=true`,
             {
               ...line,
+              RecId1: undefined,
               SRF_HSEIdImprovementOpportunities:
                 line.SRF_HSEIdImprovementOpportunities.length === 0 &&
                 opportunityResponse.data &&
@@ -223,8 +225,6 @@ router.post("/", async (req, res) => {
         "diagnostic-evidences"
       );
 
-      console.error(blobServiceClient, containerClient);
-
       for (let i = 0; i < evidences.length; i++) {
         const element = evidences[i];
 
@@ -249,8 +249,6 @@ router.post("/", async (req, res) => {
             buffer,
             buffer.byteLength
           );
-
-          console.error(responseImage);
 
           const imageRequest = {
             _DataareaId: diagnostic.dataAreaId,

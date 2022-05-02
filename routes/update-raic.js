@@ -181,6 +181,7 @@ router.post("/", async (req, res) => {
           `${tenant}/data/SRF_HSEEventDetails(RecId1=${eventDetails.RecId1},dataAreaId='${eventDetails.dataAreaId}',SRF_HSEIdUnsafeCondition='${eventDetails.SRF_HSEIdUnsafeCondition}')?cross-company=true`,
           {
             ...eventDetails,
+            RecId1:undefined,
             EventDate2: moment(eventDetails.EventDate2).add(5, "hours"),
           },
           {
@@ -229,7 +230,6 @@ router.post("/", async (req, res) => {
             ) {
               throw new Error(error.response.data.error.innererror.message);
             } else if (error.request) {
-              console.error(error.request);
               throw new Error(error.request);
             } else {
               throw new Error("Error", error.message);
@@ -253,6 +253,7 @@ router.post("/", async (req, res) => {
             `${tenant}/data/SRF_HSEEventCauses?cross-company=true&$format=application/json;odata.metadata=none`,
             {
               ...cause,
+              RecId1: undefined,
               dataAreaId: eventDetails.dataAreaId,
               SRF_HSEIdUnsafeCondition: eventDetails.SRF_HSEIdUnsafeCondition,
               RefRecid: eventDetails.RecId1,
@@ -326,6 +327,7 @@ router.post("/", async (req, res) => {
             `${tenant}/data/SRF_HSEPotentialEventDamage?cross-company=true&$format=application/json;odata.metadata=none`,
             {
               ...damage,
+              RecId1: undefined,
               dataAreaId: eventDetails.dataAreaId,
               SRF_HSEIdUnsafeCondition: eventDetails.SRF_HSEIdUnsafeCondition,
               RefRecid: eventDetails.RecId1,
@@ -363,8 +365,6 @@ router.post("/", async (req, res) => {
       const containerClient =
         blobServiceClient.getContainerClient("raic-evidences");
 
-      console.error(blobServiceClient, containerClient);
-
       for (let i = 0; i < evidences.length; i++) {
         const element = evidences[i];
 
@@ -389,8 +389,6 @@ router.post("/", async (req, res) => {
             buffer,
             buffer.byteLength
           );
-
-          console.error(responseImage);
 
           const imageRequest = {
             _DataareaId: unsafeCondition.dataAreaId,
@@ -477,6 +475,7 @@ router.post("/", async (req, res) => {
       _potentialEventDamage,
       _evidences,
     });
+    
   } catch (error) {
     return res.status(500).json({
       result: false,
