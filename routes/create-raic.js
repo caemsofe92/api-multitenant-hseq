@@ -7,7 +7,7 @@ const { BlobServiceClient } = require("@azure/storage-blob");
 require('moment/locale/es');
 
 router.post("/", async (req, res) => {
- 
+    console.log(process.env);
     const tenantUrl = req.query.tenantUrl || (req.body && req.body.tenantUrl);
     const clientId = req.query.clientId || (req.body && req.body.clientId);
     const clientSecret =
