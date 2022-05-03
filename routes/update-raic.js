@@ -138,6 +138,7 @@ router.post("/", async (req, res) => {
           `${tenant}/data/UnsafeConditionsReports(dataAreaId='${unsafeCondition.dataAreaId}',SRF_HSEIdUnsafeCondition='${unsafeCondition.SRF_HSEIdUnsafeCondition}')?cross-company=true`,
           {
             ...unsafeCondition,
+            RecId1: undefined,
             SRF_HSEIdImprovementOpportunities:
               _improvementOpportunity &&
               _improvementOpportunity.SRF_HSEIdImprovementOpportunities &&
@@ -180,6 +181,7 @@ router.post("/", async (req, res) => {
           `${tenant}/data/SRF_HSEEventDetails(RecId1=${eventDetails.RecId1},dataAreaId='${eventDetails.dataAreaId}',SRF_HSEIdUnsafeCondition='${eventDetails.SRF_HSEIdUnsafeCondition}')?cross-company=true`,
           {
             ...eventDetails,
+            RecId1: undefined,
             EventDate2: moment(eventDetails.EventDate2).add(5, "hours"),
           },
           {
@@ -357,11 +359,11 @@ router.post("/", async (req, res) => {
 
     if (evidences) {
       const blobServiceClient = BlobServiceClient.fromConnectionString(
-        "DefaultEndpointsProtocol=https;AccountName=multitenantappsstorage;AccountKey=dUEqKBrzMOB0qzOSZMADxP4ywLWJnmTh4s2ar5hh3yhkKmlgaQUlsIDmdB89EMG00fCu2lIIYFiJYfpjZ3duJQ==;EndpointSuffix=core.windows.net"
+        process.env.BLOBSTORAGECONNECTIONSTRING
       );
 
       const containerClient =
-        blobServiceClient.getContainerClient("raic-evidences");
+        blobServiceClient.getContainerClient(process.env.BLOBSTORAGERAICPATH);
 
       for (let i = 0; i < evidences.length; i++) {
         const element = evidences[i];
@@ -390,7 +392,7 @@ router.post("/", async (req, res) => {
 
           const imageRequest = {
             _DataareaId: unsafeCondition.dataAreaId,
-            _AccesInformation: `https://multitenantappsstorage.blob.core.windows.net/raic-evidences/${name}`,
+            _AccesInformation: `${process.env.BLOBSTORAGEURL}/${process.env.BLOBSTORAGERAICPATH}/${name}`,
             _name: name,
             _TableId: 20371,
             _RefRecId: unsafeCondition.RecId1,
@@ -434,9 +436,9 @@ router.post("/", async (req, res) => {
     if (email && unsafeCondition.State === "Close") {
       await axios
         .post(
-          "https://prod-60.westus.logic.azure.com:443/workflows/ff6b14da6ee9444fb7f3c46b4558981b/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=Ba7NYh2lQRCXvSaz6xMQXKHGrQ1QWl48svmf6NS-c9c",
+          process.env.EMAILNOTIFICATIONURL,
           {
-            recipients: !email.recipients || email.recipients === "" ? "carlos.soto@srfconsultores.com" : email.recipients,
+            recipients: !email.recipients || email.recipients === "" ? process.env.DEVELOPEREMAIL : email.recipients,
             message: `<div><p>Señores</p><p>Cordial saludo;</p><p>Nos permitimos notificarles que el ${unsafeCondition.SRF_HSEIdUnsafeCondition} reportado por ${email.Responsable} en ${email.Company} ha sido cerrado exitosamente.</p><p>Gracias</p></div>`,
             subject: `Reporte de actos, incidentes y condiciones inseguras cerrado - ${unsafeCondition.SRF_HSEIdUnsafeCondition} ${email.Company}`,
           },

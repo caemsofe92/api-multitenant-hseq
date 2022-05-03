@@ -217,11 +217,11 @@ router.post("/", async (req, res) => {
 
     if (evidences) {
       const blobServiceClient = BlobServiceClient.fromConnectionString(
-        "DefaultEndpointsProtocol=https;AccountName=multitenantappsstorage;AccountKey=dUEqKBrzMOB0qzOSZMADxP4ywLWJnmTh4s2ar5hh3yhkKmlgaQUlsIDmdB89EMG00fCu2lIIYFiJYfpjZ3duJQ==;EndpointSuffix=core.windows.net"
+        process.env.BLOBSTORAGECONNECTIONSTRING
       );
 
       const containerClient = blobServiceClient.getContainerClient(
-        "diagnostic-evidences"
+        process.env.BLOBSTORAGEDIAGNOSTICPATH
       );
 
       for (let i = 0; i < evidences.length; i++) {
@@ -251,7 +251,7 @@ router.post("/", async (req, res) => {
 
           const imageRequest = {
             _DataareaId: diagnostic.dataAreaId,
-            _AccesInformation: `https://multitenantappsstorage.blob.core.windows.net/diagnostic-evidences/${name}`,
+            _AccesInformation: `${process.env.BLOBSTORAGEURL}/${process.env.BLOBSTORAGEDIAGNOSTICPATH}/${name}`,
             _name: name,
             _TableId: 17070,
             _RefRecId: element.refRecId,
@@ -294,9 +294,9 @@ router.post("/", async (req, res) => {
     if (email) {
       await axios
         .post(
-          "https://prod-60.westus.logic.azure.com:443/workflows/ff6b14da6ee9444fb7f3c46b4558981b/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=Ba7NYh2lQRCXvSaz6xMQXKHGrQ1QWl48svmf6NS-c9c",
+          process.env.EMAILNOTIFICATIONURL,
           {
-            recipients: !email.recipients || email.recipients === "" ? "carlos.soto@srfconsultores.com" : email.recipients,
+            recipients: !email.recipients || email.recipients === "" ? process.env.DEVELOPEREMAIL : email.recipients,
             message: `<div><p>Señores</p><p>Cordial saludo;</p><p>Nos permitimos notificarles que el ${diagnostic.SRF_HSEIdDiagnostic} de tipo ${email.TipoDiagnostico}, ha sido ejecutado por ${email.Responsable} en ${email.Company} exitosamente.</p><p>Gracias</p></div>`,
             subject: `Diagnóstico ejecutado - ${diagnostic.SRF_HSEIdDiagnostic} ${email.Company}`,
           },

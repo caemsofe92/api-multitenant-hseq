@@ -2,6 +2,8 @@ var createError = require("http-errors");
 var express = require("express");
 var cookieParser = require("cookie-parser");
 const compression = require("compression");
+const dotenv = require('dotenv');
+dotenv.config();
 
 var indexRouter = require("./routes/index");
 var createRAICRouter = require("./routes/create-raic");
