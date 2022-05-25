@@ -557,9 +557,9 @@ router.post("/", async (req, res) => {
               unsafeCondition.Description ? unsafeCondition.Description : ""
             }</p><p>Alcance: ${
               email.Scope ? email.Scope : ""
-            }</p><p>Centro de trabajo: ${email.Zone}</p><p>Proceso: ${
+            }</p><p>Centro de trabajo: ${email.Zone ? email.Zone : ''}</p><p>Proceso: ${
               email.Process ? email.Process : ""
-            }</p><p>Actividad: ${email.Activity}</p><p>Trabajo: ${
+            }</p><p>Actividad: ${email.Activity ? email.Activity : ''}</p><p>Trabajo: ${
               email.Job ? email.Job : ""
             }</p><p>Gracias</p></div>`;
 
@@ -571,9 +571,9 @@ router.post("/", async (req, res) => {
               unsafeCondition.Description ? unsafeCondition.Description : ""
             }</p><p>Alcance: ${
               email.Scope ? email.Scope : ""
-            }</p><p>Centro de trabajo: ${email.Zone}</p><p>Proceso: ${
+            }</p><p>Centro de trabajo: ${email.Zone ? email.Zone : ''}</p><p>Proceso: ${
               email.Process ? email.Process : ""
-            }</p><p>Actividad: ${email.Activity}</p><p>Trabajo: ${
+            }</p><p>Actividad: ${email.Activity ? email.Activity : ''}</p><p>Trabajo: ${
               email.Job ? email.Job : ""
             }</p></div>`;
 
