@@ -292,17 +292,134 @@ router.post("/", async (req, res) => {
     }
 
     if (email) {
-      await axios
-        .post(
-          process.env.EMAILNOTIFICATIONURL,
-          {
-            recipients: !email.recipients || email.recipients === "" ? process.env.DEVELOPEREMAIL : email.recipients,
-            message: `<div><p>Señores</p><p>Cordial saludo;</p><p>Nos permitimos notificarles que el ${diagnostic.SRF_HSEIdDiagnostic} de tipo ${email.TipoDiagnostico}, ha sido ejecutado por ${email.Responsable} en ${email.Company} exitosamente.</p><p>Gracias</p></div>`,
-            subject: `Diagnóstico ejecutado - ${diagnostic.SRF_HSEIdDiagnostic} ${email.Company}`,
+
+      let tokenDataverse = await client.get(environment + "Dataverse");
+
+      if (!tokenDataverse) {
+        const tokenResponse = await axios
+          .post(
+            `https://login.microsoftonline.com/${tenantUrl}/oauth2/token`,
+            `grant_type=client_credentials&client_id=${clientId}&client_secret=${clientSecret}&resource=${email.tenantDataverse}/`,
+            {
+              headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+              },
+            }
+          )
+          .catch(function (error) {
+            if (
+              error.response &&
+              error.response.data &&
+              error.response.data.error &&
+              error.response.data.error.innererror &&
+              error.response.data.error.innererror.message
+            ) {
+              throw new Error(error.response.data.error.innererror.message);
+            } else if (error.request) {
+              throw new Error(error.request);
+            } else {
+              throw new Error("Error", error.message);
+            }
+          });
+        tokenDataverse = tokenResponse.data.access_token;
+        await client.set(environment + "Dataverse", tokenDataverse, {
+          EX: 3599,
+        });
+      }
+
+      const EntityDataverse1 = axios.get(
+        `${email.tenantDataverse}/api/data/v9.2/cr5be_hseqnotifications?$select=cr5be_type,cr5be_emailgroupid,cr5be_zone,cr5be_process,cr5be_notificationcompany,statecode,cr5be_scope,cr5be_notificationevent`,
+        {
+          headers: {
+            Authorization: "Bearer " + tokenDataverse,
+            Accept: "application/json;odata.metadata=none",
+            Prefer:
+              "odata.include-annotations=OData.Community.Display.V1.FormattedValue",
           },
-          {
-            headers: { "Content-Type": "application/json" },
-          }
+        }
+      );
+
+      await axios
+        .all([EntityDataverse1])
+        .then(
+          axios.spread(async (...responses) => {
+            const hseqNotifications = responses[0].data.value.filter((item) => {
+              if (
+                (item[
+                  "cr5be_notificationevent@OData.Community.Display.V1.FormattedValue"
+                ] === "Edit Diagnostic" ||
+                  item[
+                    "cr5be_notificationevent@OData.Community.Display.V1.FormattedValue"
+                  ] === "All Events") &&
+                (item[
+                  "cr5be_notificationcompany@OData.Community.Display.V1.FormattedValue"
+                ] === diagnostic.dataAreaId ||
+                  item[
+                    "cr5be_notificationcompany@OData.Community.Display.V1.FormattedValue"
+                  ] === "All Companies") &&
+                item["statecode@OData.Community.Display.V1.FormattedValue"] ===
+                  "Active"
+              ) {
+                return true;
+              }
+              return false;
+            });
+
+            const hseqNotificationEmail = hseqNotifications
+              .filter(
+                (item) =>
+                  item[
+                    "cr5be_type@OData.Community.Display.V1.FormattedValue"
+                  ] === "Email"
+              )
+              .map((item) => item["cr5be_emailgroupid"])
+              .join(";");
+            const hseqNotificationTeams = hseqNotifications
+              .filter(
+                (item) =>
+                  item[
+                    "cr5be_type@OData.Community.Display.V1.FormattedValue"
+                  ] === "Teams Group"
+              )
+              .map((item) => item["cr5be_emailgroupid"]);
+
+            const emailMessage = `<div><p>Señores</p><p>Cordial saludo;</p><p>Nos permitimos notificarles que la inspección ${diagnostic.SRF_HSEIdDiagnostic} de tipo ${email.TipoDiagnostico}, ha sido ejecutada exitosamente por ${email.Responsable} en ${email.Company}.</p><p>Gracias</p></div>`;
+
+            const teamsMessage = `<div><p>Inspección ejecutada</p><p>Nos permitimos notificarles que la inspección ${diagnostic.SRF_HSEIdDiagnostic} de tipo ${email.TipoDiagnostico}, ha sido ejecutada exitosamente por ${email.Responsable} en ${email.Company}.</p></div>`;
+
+            await axios
+              .post(
+                process.env.EMAILNOTIFICATIONURL,
+                {
+                  recipients:
+                    !hseqNotificationEmail || hseqNotificationEmail === ""
+                      ? process.env.DEVELOPEREMAIL
+                      : hseqNotificationEmail,
+                  recipientsGroups: hseqNotificationTeams,
+                  emailMessage,
+                  teamsMessage,
+                  subject: `Inspección ejecutada - ${diagnostic.SRF_HSEIdDiagnostic} ${email.Company}`,
+                },
+                {
+                  headers: { "Content-Type": "application/json" },
+                }
+              )
+              .catch(function (error) {
+                if (
+                  error.response &&
+                  error.response.data &&
+                  error.response.data.error &&
+                  error.response.data.error.innererror &&
+                  error.response.data.error.innererror.message
+                ) {
+                  throw new Error(error.response.data.error.innererror.message);
+                } else if (error.request) {
+                  throw new Error(error.request);
+                } else {
+                  throw new Error("Error", error.message);
+                }
+              });
+          })
         )
         .catch(function (error) {
           if (
