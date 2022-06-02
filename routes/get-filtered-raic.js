@@ -14,7 +14,6 @@ router.post("/", async (req, res) => {
     const offset = req.query.offset || (req.body && req.body.offset);
     const numberOfElements =
       req.query.numberOfElements || (req.body && req.body.numberOfElements);
-    const isTest = req.query.isTest || (req.body && req.body.isTest);
     const refresh = req.query.refresh || (req.body && req.body.refresh);
     const userCompany =
       req.query.userCompany || (req.body && req.body.userCompany);
@@ -100,7 +99,7 @@ router.post("/", async (req, res) => {
     );
     const Entity2 = axios.get(
       `${tenant}/data/SRF_HSEEventDetails?$format=application/json;odata.metadata=none${
-        isTest && numberOfElements ? "&$top=" + numberOfElements : ""
+         numberOfElements ? "&$top=" + numberOfElements : ""
       }&cross-company=true${
         userCompany ? `&$filter=dataAreaId eq '${userCompany}'` : ""
       }`,
@@ -108,7 +107,7 @@ router.post("/", async (req, res) => {
     );
     const Entity3 = axios.get(
       `${tenant}/data/SRF_HSEEventCauses?$format=application/json;odata.metadata=none${
-        isTest && numberOfElements ? "&$top=" + numberOfElements : ""
+         numberOfElements ? "&$top=" + numberOfElements : ""
       }&cross-company=true${
         userCompany ? `&$filter=dataAreaId eq '${userCompany}'` : ""
       }`,
@@ -116,7 +115,7 @@ router.post("/", async (req, res) => {
     );
     const Entity4 = axios.get(
       `${tenant}/data/SRF_HSEPotentialEventDamage?$format=application/json;odata.metadata=none${
-        isTest && numberOfElements ? "&$top=" + numberOfElements : ""
+         numberOfElements ? "&$top=" + numberOfElements : ""
       }&cross-company=true${
         userCompany ? `&$filter=dataAreaId eq '${userCompany}'` : ""
       }`,
@@ -125,7 +124,7 @@ router.post("/", async (req, res) => {
 
     const Entity5 = axios.get(
       `${tenant}/data/SRF_DocuRef?$format=application/json;odata.metadata=none${
-        isTest && numberOfElements ? "&$top=" + numberOfElements : ""
+         numberOfElements ? "&$top=" + numberOfElements : ""
       }&cross-company=true&$select=OriginalFileName,RefRecId&$filter=${
         userCompany ? `RefCompanyId eq '${userCompany}' and ` : ""
       }RefTableId eq 20371 and TypeId eq 'File' and OriginalFileName eq '*hseqraicimage*'`,
@@ -134,7 +133,7 @@ router.post("/", async (req, res) => {
 
     const Entity6 = axios.get(
       `${tenant}/data/SRF_HSEImprovementOpportunities?$format=application/json;odata.metadata=none${
-        isTest && numberOfElements ? "&$top=" + numberOfElements : ""
+         numberOfElements ? "&$top=" + numberOfElements : ""
       }&cross-company=true&$select=Description,SRF_HSEIdImprovementOpportunities,RefRecId&$filter=${
         userCompany ? `dataAreaId eq '${userCompany}' and ` : ""
       }RefTableId eq 20371`,
