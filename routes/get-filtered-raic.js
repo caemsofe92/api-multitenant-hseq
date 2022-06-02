@@ -98,43 +98,33 @@ router.post("/", async (req, res) => {
       { headers: { Authorization: "Bearer " + token } }
     );
     const Entity2 = axios.get(
-      `${tenant}/data/SRF_HSEEventDetails?$format=application/json;odata.metadata=none${
-         numberOfElements ? "&$top=" + numberOfElements : ""
-      }&cross-company=true${
+      `${tenant}/data/SRF_HSEEventDetails?$format=application/json;odata.metadata=none&cross-company=true${
         userCompany ? `&$filter=dataAreaId eq '${userCompany}'` : ""
       }`,
       { headers: { Authorization: "Bearer " + token } }
     );
     const Entity3 = axios.get(
-      `${tenant}/data/SRF_HSEEventCauses?$format=application/json;odata.metadata=none${
-         numberOfElements ? "&$top=" + numberOfElements : ""
-      }&cross-company=true${
+      `${tenant}/data/SRF_HSEEventCauses?$format=application/json;odata.metadata=none&cross-company=true${
         userCompany ? `&$filter=dataAreaId eq '${userCompany}'` : ""
       }`,
       { headers: { Authorization: "Bearer " + token } }
     );
     const Entity4 = axios.get(
-      `${tenant}/data/SRF_HSEPotentialEventDamage?$format=application/json;odata.metadata=none${
-         numberOfElements ? "&$top=" + numberOfElements : ""
-      }&cross-company=true${
+      `${tenant}/data/SRF_HSEPotentialEventDamage?$format=application/json;odata.metadata=none&cross-company=true${
         userCompany ? `&$filter=dataAreaId eq '${userCompany}'` : ""
       }`,
       { headers: { Authorization: "Bearer " + token } }
     );
 
     const Entity5 = axios.get(
-      `${tenant}/data/SRF_DocuRef?$format=application/json;odata.metadata=none${
-         numberOfElements ? "&$top=" + numberOfElements : ""
-      }&cross-company=true&$select=OriginalFileName,RefRecId&$filter=${
+      `${tenant}/data/SRF_DocuRef?$format=application/json;odata.metadata=none&cross-company=true&$select=OriginalFileName,RefRecId&$filter=${
         userCompany ? `RefCompanyId eq '${userCompany}' and ` : ""
       }RefTableId eq 20371 and TypeId eq 'File' and OriginalFileName eq '*hseqraicimage*'`,
       { headers: { Authorization: "Bearer " + token } }
     );
 
     const Entity6 = axios.get(
-      `${tenant}/data/SRF_HSEImprovementOpportunities?$format=application/json;odata.metadata=none${
-         numberOfElements ? "&$top=" + numberOfElements : ""
-      }&cross-company=true&$select=Description,SRF_HSEIdImprovementOpportunities,RefRecId&$filter=${
+      `${tenant}/data/SRF_HSEImprovementOpportunities?$format=application/json;odata.metadata=none&cross-company=true&$select=Description,SRF_HSEIdImprovementOpportunities,RefRecId&$filter=${
         userCompany ? `dataAreaId eq '${userCompany}' and ` : ""
       }RefTableId eq 20371`,
       { headers: { Authorization: "Bearer " + token } }
