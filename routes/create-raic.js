@@ -492,7 +492,7 @@ router.post("/", async (req, res) => {
               unsafeCondition.UtcDrawingDate
             ).format("DD/MM/YYYY")} a las ${moment(
               unsafeCondition.UtcDrawingDate
-            ).format("h:mm:ss a")}, ${email.Responsable} ha generado el ${
+            ).format("h:mm:ss a")}, ${email.Responsable && email.Responsable !== "" ? email.Responsable : "se"} ha generado el ${
               _unsafeCondition.SRF_HSEIdUnsafeCondition
             } de tipo “${email.TipoReporte}” en ${
               email.Company
@@ -510,7 +510,7 @@ router.post("/", async (req, res) => {
               unsafeCondition.UtcDrawingDate
             ).format("DD/MM/YYYY")} a las ${moment(
               unsafeCondition.UtcDrawingDate
-            ).format("h:mm:ss a")}, ${email.Responsable} ha generado el ${
+            ).format("h:mm:ss a")}, ${email.Responsable && email.Responsable !== "" ? email.Responsable : "se"} ha generado el ${
               _unsafeCondition.SRF_HSEIdUnsafeCondition
             } de tipo “${email.TipoReporte}” en ${
               email.Company

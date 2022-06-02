@@ -551,7 +551,7 @@ router.post("/", async (req, res) => {
 
             const emailMessage = `<div><p>Señores</p><p>Cordial saludo;</p><p>Nos permitimos notificarles que el ${
               unsafeCondition.SRF_HSEIdUnsafeCondition
-            } reportado por ${email.Responsable} en ${
+            } reportado${email.Responsable && email.Responsable !== "" ? " por " + email.Responsable + " " : " "}en ${
               email.Company
             } ha sido cerrado exitosamente.</p><p>Descripción: ${
               unsafeCondition.Description ? unsafeCondition.Description : ""
@@ -565,7 +565,7 @@ router.post("/", async (req, res) => {
 
             const teamsMessage = `<div><p>Reporte de actos, incidentes y condiciones inseguras cerrado</p><br/><p>Nos permitimos notificarles que el ${
               unsafeCondition.SRF_HSEIdUnsafeCondition
-            } reportado por ${email.Responsable} en ${
+            } reportado${email.Responsable && email.Responsable !== "" ? " por " + email.Responsable + " " : " "}en ${
               email.Company
             } ha sido cerrado exitosamente.</p><br/><p>Descripción: ${
               unsafeCondition.Description ? unsafeCondition.Description : ""
