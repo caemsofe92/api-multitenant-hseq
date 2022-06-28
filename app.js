@@ -16,6 +16,7 @@ var getDiagnostic = require("./routes/get-diagnostic");
 var getWorkers = require("./routes/get-workers-number");
 var calculatePaginationList = require("./routes/calculate-pagination-list");
 var checkConnection = require("./routes/check-connection");
+var ping = require("./routes/ping");
 
 var app = express();
 app.use(compression());
@@ -34,6 +35,7 @@ app.use("/get-filtered-raic", getFilterRaic);
 app.use("/get-workers-number", getWorkers);
 app.use("/calculate-pagination-list", calculatePaginationList);
 app.use("/check-connection", checkConnection);
+app.use("/ping", ping);
 
 app.use(function (req, res, next) {
   next(createError(404));
