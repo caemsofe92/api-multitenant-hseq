@@ -18,6 +18,8 @@ router.post("/", async (req, res) => {
     const refresh = req.query.refresh || (req.body && req.body.refresh);
     const userCompany =
       req.query.userCompany || (req.body && req.body.userCompany);
+    const userId =
+      req.query.userId || (req.body && req.body.userId);
     const environment =
       req.query.environment || (req.body && req.body.environment);
 
@@ -150,7 +152,9 @@ router.post("/", async (req, res) => {
       `${tenant}/data/UnsafeConditionsReports?$format=application/json;odata.metadata=none${
         numberOfElements ? "&$top=" + numberOfElements : ""
       }${offset ? "&$skip=" + offset : ""}&$count=true&cross-company=true${
-        userCompany ? `&$filter=dataAreaId eq '${userCompany}'` : ""
+        userCompany ? `&$filter=dataAreaId eq '${userCompany}'${
+          userId ? ` and CreatedByApp eq '${userId}'` : ""
+        }` : ""
       }&$orderby=UtcDrawingDate desc`,
       { headers: { Authorization: "Bearer " + token } }
     );
