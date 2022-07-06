@@ -20,6 +20,8 @@ router.post("/", async (req, res) => {
       req.query.userCompany || (req.body && req.body.userCompany);
     const userId =
       req.query.userId || (req.body && req.body.userId);
+    const userResponsible =
+      req.query.userResponsible || (req.body && req.body.userResponsible);
     const environment =
       req.query.environment || (req.body && req.body.environment);
 
@@ -153,7 +155,7 @@ router.post("/", async (req, res) => {
         numberOfElements ? "&$top=" + numberOfElements : ""
       }${offset ? "&$skip=" + offset : ""}&$count=true&cross-company=true${
         userCompany ? `&$filter=dataAreaId eq '${userCompany}'${
-          userId ? ` and CreatedByApp eq '${userId}'` : ""
+          userId && userResponsible ? ` and (CreatedByApp eq '${userId}' or Responsible eq '${userResponsible}')` : ""
         }` : ""
       }&$orderby=UtcDrawingDate desc`,
       { headers: { Authorization: "Bearer " + token } }
