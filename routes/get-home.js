@@ -4,7 +4,7 @@ const client = require("../bin/redis-client");
 const axios = require("axios");
 
 router.post("/", async (req, res) => {
-  try {
+ 
     const tenantUrl = req.query.tenantUrl || (req.body && req.body.tenantUrl);
     const clientId = req.query.clientId || (req.body && req.body.clientId);
     const clientSecret =
@@ -158,10 +158,10 @@ router.post("/", async (req, res) => {
               return { Name: Rol.Name };
             }),
             SRFUserData: {
-              UserId: PersonUsers.UserId,
-              PersonName: PersonUsers.PersonName,
-              PersonnelNumber: HcmWorkers.PersonnelNumber,
-              Company: responses[0].data.value[0].company,
+              UserId: PersonUsers.UserId ? PersonUsers.UserId : null,
+              PersonName: PersonUsers.PersonName ? PersonUsers.PersonName : null,
+              PersonnelNumber: HcmWorkers.PersonnelNumber ? HcmWorkers.PersonnelNumber : null,
+              Company: responses[0].data.value && responses[0].data.value.length > 0 ? responses[0].data.value[0].company : null,
             },
             Companies: responses[2].data.value,
           };
@@ -185,9 +185,11 @@ router.post("/", async (req, res) => {
         } else if (error.request) {
           throw new Error(error.request);
         } else {
+          console.log(error);
           throw new Error("Error", error.message);
         }
       });
+      try {
   } catch (error) {
     return res.status(500).json({
       result: false,
