@@ -32,21 +32,21 @@ router.post("/", async (req, res) => {
     const email = req.query.email || (req.body && req.body.email);
 
     if (!tenantUrl || tenantUrl.length === 0)
-      throw new Error("tenantUrl is Mandatory");
+      throw new Error("Error", "tenantUrl is Mandatory");
 
     if (!clientId || clientId.length === 0)
-      throw new Error("clientId is Mandatory");
+      throw new Error("Error", "clientId is Mandatory");
 
     if (!clientSecret || clientSecret.length === 0)
-      throw new Error("clientSecret is Mandatory");
+      throw new Error("Error", "clientSecret is Mandatory");
 
     if (!tenant || tenant.length === 0) throw new Error("tenant is Mandatory");
 
     if (!environment || environment.length === 0)
-      throw new Error("environment is Mandatory");
+      throw new Error("Error", "environment is Mandatory");
 
     if (!unsafeCondition || unsafeCondition.length === 0)
-      throw new Error("unsafeCondition is Mandatory");
+      throw new Error("Error", "unsafeCondition is Mandatory");
 
     if (!client.isOpen) client.connect();
 
@@ -67,9 +67,9 @@ router.post("/", async (req, res) => {
             error.response.data.error.innererror &&
             error.response.data.error.innererror.message
           ) {
-            throw new Error(error.response.data.error.innererror.message);
+            throw new Error("Error", error.response.data.error.innererror.message);
           } else if (error.request) {
-            throw new Error(error.request);
+            throw new Error("Error", error.request);
           } else {
             throw new Error("Error", error.message);
           }
@@ -101,9 +101,9 @@ router.post("/", async (req, res) => {
           error.response.data.error.innererror &&
           error.response.data.error.innererror.message
         ) {
-          throw new Error(error.response.data.error.innererror.message);
+          throw new Error("Error", error.response.data.error.innererror.message);
         } else if (error.request) {
-          throw new Error(error.request);
+          throw new Error("Error", error.request);
         } else {
           throw new Error("Error", error.message);
         }
@@ -140,11 +140,11 @@ router.post("/", async (req, res) => {
             error.response.data.error.innererror &&
             error.response.data.error.innererror.message
           ) {
-            throw new Error(error.response.data.error.innererror.message);
+            throw new Error(`${_unsafeCondition.SRF_HSEIdUnsafeCondition ? "ConditionCreated" : "Error"}`, error.response.data.error.innererror.message);
           } else if (error.request) {
-            throw new Error(error.request);
+            throw new Error(`${_unsafeCondition.SRF_HSEIdUnsafeCondition ? "ConditionCreated" : "Error"}`, error.request);
           } else {
-            throw new Error("Error", error.message);
+            throw new Error(`${_unsafeCondition.SRF_HSEIdUnsafeCondition ? "ConditionCreated" : "Error"}`, error.message);
           }
         });
       _improvementOpportunity = _improvementOpportunity.data
@@ -174,11 +174,11 @@ router.post("/", async (req, res) => {
             error.response.data.error.innererror &&
             error.response.data.error.innererror.message
           ) {
-            throw new Error(error.response.data.error.innererror.message);
+            throw new Error(`${_unsafeCondition.SRF_HSEIdUnsafeCondition ? "ConditionCreated" : "Error"}`, error.response.data.error.innererror.message);
           } else if (error.request) {
-            throw new Error(error.request);
+            throw new Error(`${_unsafeCondition.SRF_HSEIdUnsafeCondition ? "ConditionCreated" : "Error"}`, error.request);
           } else {
-            throw new Error("Error", error.message);
+            throw new Error(`${_unsafeCondition.SRF_HSEIdUnsafeCondition ? "ConditionCreated" : "Error"}`, error.message);
           }
         });
 
@@ -210,11 +210,11 @@ router.post("/", async (req, res) => {
             error.response.data.error.innererror &&
             error.response.data.error.innererror.message
           ) {
-            throw new Error(error.response.data.error.innererror.message);
+            throw new Error(`${_unsafeCondition.SRF_HSEIdUnsafeCondition ? "ConditionCreated" : "Error"}`, error.response.data.error.innererror.message);
           } else if (error.request) {
-            throw new Error(error.request);
+            throw new Error(`${_unsafeCondition.SRF_HSEIdUnsafeCondition ? "ConditionCreated" : "Error"}`, error.request);
           } else {
-            throw new Error("Error", error.message);
+            throw new Error(`${_unsafeCondition.SRF_HSEIdUnsafeCondition ? "ConditionCreated" : "Error"}`, error.message);
           }
         });
       _eventDetails = _eventDetails.data;
@@ -247,11 +247,11 @@ router.post("/", async (req, res) => {
               error.response.data.error.innererror &&
               error.response.data.error.innererror.message
             ) {
-              throw new Error(error.response.data.error.innererror.message);
+              throw new Error(`${_unsafeCondition.SRF_HSEIdUnsafeCondition ? "ConditionCreated" : "Error"}`, error.response.data.error.innererror.message);
             } else if (error.request) {
-              throw new Error(error.request);
+              throw new Error(`${_unsafeCondition.SRF_HSEIdUnsafeCondition ? "ConditionCreated" : "Error"}`, error.request);
             } else {
-              throw new Error("Error", error.message);
+              throw new Error(`${_unsafeCondition.SRF_HSEIdUnsafeCondition ? "ConditionCreated" : "Error"}`, error.message);
             }
           });
         _eventCauses.push(causeResponse.data);
@@ -284,11 +284,11 @@ router.post("/", async (req, res) => {
               error.response.data.error.innererror &&
               error.response.data.error.innererror.message
             ) {
-              throw new Error(error.response.data.error.innererror.message);
+              throw new Error(`${_unsafeCondition.SRF_HSEIdUnsafeCondition ? "ConditionCreated" : "Error"}`, error.response.data.error.innererror.message);
             } else if (error.request) {
-              throw new Error(error.request);
+              throw new Error(`${_unsafeCondition.SRF_HSEIdUnsafeCondition ? "ConditionCreated" : "Error"}`, error.request);
             } else {
-              throw new Error("Error", error.message);
+              throw new Error(`${_unsafeCondition.SRF_HSEIdUnsafeCondition ? "ConditionCreated" : "Error"}`, error.message);
             }
           });
         _potentialEventDamage.push(damageResponse.data);
@@ -357,11 +357,11 @@ router.post("/", async (req, res) => {
                   error.response.data.error.innererror &&
                   error.response.data.error.innererror.message
                 ) {
-                  throw new Error(error.response.data.error.innererror.message);
+                  throw new Error(`${_unsafeCondition.SRF_HSEIdUnsafeCondition ? "ConditionCreated" : "Error"}`, error.response.data.error.innererror.message);
                 } else if (error.request) {
-                  throw new Error(error.request);
+                  throw new Error(`${_unsafeCondition.SRF_HSEIdUnsafeCondition ? "ConditionCreated" : "Error"}`, error.request);
                 } else {
-                  throw new Error("Error", error.message);
+                  throw new Error(`${_unsafeCondition.SRF_HSEIdUnsafeCondition ? "ConditionCreated" : "Error"}`, error.message);
                 }
               });
             _evidences.push({
@@ -395,11 +395,11 @@ router.post("/", async (req, res) => {
               error.response.data.error.innererror &&
               error.response.data.error.innererror.message
             ) {
-              throw new Error(error.response.data.error.innererror.message);
+              throw new Error(`${_unsafeCondition.SRF_HSEIdUnsafeCondition ? "ConditionCreated" : "Error"}`, error.response.data.error.innererror.message);
             } else if (error.request) {
-              throw new Error(error.request);
+              throw new Error(`${_unsafeCondition.SRF_HSEIdUnsafeCondition ? "ConditionCreated" : "Error"}`, error.request);
             } else {
-              throw new Error("Error", error.message);
+              throw new Error(`${_unsafeCondition.SRF_HSEIdUnsafeCondition ? "ConditionCreated" : "Error"}`, error.message);
             }
           });
         tokenDataverse = tokenResponse.data.access_token;
@@ -549,11 +549,11 @@ router.post("/", async (req, res) => {
                   error.response.data.error.innererror &&
                   error.response.data.error.innererror.message
                 ) {
-                  throw new Error(error.response.data.error.innererror.message);
+                  throw new Error(`${_unsafeCondition.SRF_HSEIdUnsafeCondition ? "ConditionCreated" : "Error"}`, error.response.data.error.innererror.message);
                 } else if (error.request) {
-                  throw new Error(error.request);
+                  throw new Error(`${_unsafeCondition.SRF_HSEIdUnsafeCondition ? "ConditionCreated" : "Error"}`, error.request);
                 } else {
-                  throw new Error("Error", error.message);
+                  throw new Error(`${_unsafeCondition.SRF_HSEIdUnsafeCondition ? "ConditionCreated" : "Error"}`, error.message);
                 }
               });
           })
@@ -566,11 +566,11 @@ router.post("/", async (req, res) => {
             error.response.data.error.innererror &&
             error.response.data.error.innererror.message
           ) {
-            throw new Error(error.response.data.error.innererror.message);
+            throw new Error(`${_unsafeCondition.SRF_HSEIdUnsafeCondition ? "ConditionCreated" : "Error"}`, error.response.data.error.innererror.message);
           } else if (error.request) {
-            throw new Error(error.request);
+            throw new Error(`${_unsafeCondition.SRF_HSEIdUnsafeCondition ? "ConditionCreated" : "Error"}`, error.request);
           } else {
-            throw new Error("Error", error.message);
+            throw new Error(`${_unsafeCondition.SRF_HSEIdUnsafeCondition ? "ConditionCreated" : "Error"}`, error.message);
           }
         });
     }
